@@ -1,5 +1,5 @@
 show_peak_finding_plots = false
-stack_direction = "horizontal"
+stacking_direction = "horizontal"
 draw_ticks = false
 add_magnitude = false
 add_events = true
