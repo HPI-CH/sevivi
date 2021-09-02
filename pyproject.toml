@@ -36,6 +36,7 @@ numpy = "^1.21.1"
 matplotlib = "^3.4.2"
 opencv-python = "^4.5.3.56"
 Pillow = "^8.3.1"
+toml = "^0.10.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.4"
