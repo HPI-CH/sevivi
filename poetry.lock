@@ -689,7 +689,7 @@ test = ["pytest"]
 name = "toml"
 version = "0.10.2"
 description = "Python Library for Tom's Obvious, Minimal Language"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 
@@ -765,7 +765,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7.1,<3.10"
-content-hash = "75a7098196b00d33e96680aa8d4d390c8708ac70a785ffaf626e3e5dde12a4a7"
+content-hash = "3fe023bf9a0afcdf269d887042e758ea2513445e6496fed988a8799509e9bcc3"
 
 [metadata.files]
 alabaster = [
