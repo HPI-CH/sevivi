@@ -7,7 +7,9 @@ from sevivi.config.config_reader import default_config
 
 
 def test_default_config():
-    assert ConfigReader.read_configs(()) == default_config, "default config should be used if no overwrites are given"
+    assert (
+        ConfigReader.read_configs(()) == default_config
+    ), "default config should be used if no overwrites are given"
 
 
 def test_missing_config_file():
@@ -34,10 +36,15 @@ def test_get_bool():
 def test_plotting_method():
     assert ConfigReader().get_plotting_method() == PlottingMethod.MOVING_VERTICAL_LINE
     non_default_config = ("../test_files/configs/push_in_plotting_method.toml",)
-    assert ConfigReader(non_default_config).get_plotting_method() == PlottingMethod.PUSH_IN
+    assert (
+        ConfigReader(non_default_config).get_plotting_method() == PlottingMethod.PUSH_IN
+    )
 
 
 def test_stack_direction():
     assert ConfigReader().get_stacking_direction() == StackingDirection.HORIZONTAL
     non_default_config = ("../test_files/configs/vertical_stacking.toml",)
-    assert ConfigReader(non_default_config).get_stacking_direction() == StackingDirection.VERTICAL
+    assert (
+        ConfigReader(non_default_config).get_stacking_direction()
+        == StackingDirection.VERTICAL
+    )

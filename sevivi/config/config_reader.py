@@ -14,12 +14,11 @@ default_config = {
     "add_events": True,
     "add_gyroscope": True,
     "use_parallel_image_ingestion": True,
-    "plotting_method": "MOVING_VERTICAL_LINE"
+    "plotting_method": "MOVING_VERTICAL_LINE",
 }
 
 
 class ConfigReader:
-
     def __init__(self, config_file_paths: Optional[Tuple[str, ...]] = None):
         self.config = ConfigReader.read_configs(config_file_paths)
 
@@ -42,18 +41,22 @@ class ConfigReader:
         if isinstance(value, bool):
             return value
         else:
-            raise ValueError(f"Configuration value {value} for key {key_name} is not a boolean")
+            raise ValueError(
+                f"Configuration value {value} for key {key_name} is not a boolean"
+            )
 
     def get_plotting_method(self) -> PlottingMethod:
-        config_plotting_method = self.config.get('plotting_method', "N/A")
+        config_plotting_method = self.config.get("plotting_method", "N/A")
         try:
             return PlottingMethod[config_plotting_method.upper()]
         except KeyError:
             raise KeyError(f"Could not parse plotting_method {config_plotting_method}")
 
     def get_stacking_direction(self) -> StackingDirection:
-        config_stacking_direction = self.config.get('stacking_direction', "N/A")
+        config_stacking_direction = self.config.get("stacking_direction", "N/A")
         try:
             return StackingDirection[config_stacking_direction.upper()]
         except KeyError:
-            raise KeyError(f"Could not parse stacking_direction {config_stacking_direction}")
+            raise KeyError(
+                f"Could not parse stacking_direction {config_stacking_direction}"
+            )
