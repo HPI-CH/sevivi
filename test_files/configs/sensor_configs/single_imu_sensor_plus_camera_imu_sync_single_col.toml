@@ -1,3 +1,0 @@
-[[sensor-data.imu-1]]
-type = "camera-imu-synced"
-sync_column = "AccX"

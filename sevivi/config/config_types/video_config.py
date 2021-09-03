@@ -30,10 +30,11 @@ class CameraImuVideoConfig(VideoConfig):
     imu_path: str = None
     """Path to the IMU data corresponding to the camera"""
 
-    sync_column: Union[str, List[str]] = None
+    camera_imu_sync_column: Union[str, List[str]] = None
     """
     Name of the columns or list of the columns that contain the IMU data to synchronize with. 
-    If a list given, the magnitude of the listed columns will be used
+    If a list given, the magnitude of the listed columns will be used.
+    All of the sensors will be synchronized to these columns.
     """
 
 

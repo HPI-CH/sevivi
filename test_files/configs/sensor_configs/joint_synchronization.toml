@@ -1,0 +1,6 @@
+[[sensor]]
+type = "joint-synced"
+sync_joint_name = "ANKLE"
+sensor_sync_axes = ["AccX", "Accel Y", "ACC Z"]
+joint_sync_axis = "ACCELERATION_MAG"
+path = "test_files/joint_imu.csv.gz"

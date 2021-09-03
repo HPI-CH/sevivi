@@ -1,5 +1,6 @@
 import collections
 import os
+from pprint import pprint, pformat
 from typing import Tuple, Optional, Dict
 
 import pandas as pd
@@ -7,7 +8,7 @@ import toml
 
 from sevivi.config import PlottingMethod, Config, VideoConfig
 from sevivi.config.config_types.sensor_config import SensorConfig, ManuallySynchronizedSensorConfig, \
-    JointSynchronizedSensorConfig
+    JointSynchronizedSensorConfig, ImuSynchronizedSensorConfig
 from sevivi.config.config_types.stacking_direction import StackingDirection
 from sevivi.config.config_types.video_config import CameraImuVideoConfig, KinectVideoConfig, RawVideoConfig, \
     OpenPoseVideoConfig
@@ -49,8 +50,8 @@ def read_configs(config_file_paths: Tuple[str, ...]) -> Config:
     else:
         raise ValueError("Missing video parameter. You need to supply a video to render next to.")
 
-    if "data" in config_dict:
-        config.data_configs = get_data_config(config_dict)
+    if "sensor" in config_dict:
+        config.data_configs = get_sensor_configs(config_dict)
     else:
         raise ValueError("Missing Video parameter. You need to supply a video to render next to.")
 
@@ -79,51 +80,59 @@ def deep_update(source, overrides):
 
 
 def get_video_config(cfg: Dict) -> VideoConfig:
-    cfg_type = cfg["type"]
-    if cfg_type == "imu":
-        result = CameraImuVideoConfig()
-        result.imu_path = cfg["imu_path"]
-        result.sync_column = cfg["sync_column"]
-    elif cfg_type == "kinect":
-        result = KinectVideoConfig()
-        result.skeleton_path = cfg["skeleton_path"]
-    elif cfg_type == "raw":
-        result = RawVideoConfig()
-    elif cfg_type == "openpose":
-        result = OpenPoseVideoConfig()
-    else:
-        raise ValueError(f"Unknown video config type {cfg_type}")
+    try:
+        cfg = cfg["video"][0]
+        cfg_type = cfg["type"]
+        if cfg_type == "imu":
+            result = CameraImuVideoConfig()
+            result.imu_path = cfg["imu_path"]
+            result.camera_imu_sync_column = cfg["camera_imu_sync_column"]
+        elif cfg_type == "kinect":
+            result = KinectVideoConfig()
+            result.skeleton_path = cfg["skeleton_path"]
+        elif cfg_type == "raw":
+            result = RawVideoConfig()
+        elif cfg_type == "openpose":
+            result = OpenPoseVideoConfig()
+        else:
+            raise ValueError(f"Unknown video config type {cfg_type}")
 
-    result.path = cfg["path"]
+        result.path = cfg["path"]
+    except KeyError as e:
+        raise KeyError(f"Missing key '{e.args[0]}' in video config: {pformat(cfg)}")
     return result
 
 
-def get_data_config(config_dict: Dict) -> Dict[str, SensorConfig]:
+def get_sensor_configs(config_dict: Dict) -> Dict[str, SensorConfig]:
     result_dict = {}
+    i, cfg = None, None
+    try:
+        config_dict = config_dict["sensor"]
+        for i, cfg in enumerate(config_dict):
+            cfg_type = cfg["type"]
+            if cfg_type == "manually-synced":
+                result = ManuallySynchronizedSensorConfig()
+                result.offset_seconds = cfg.get("offset_seconds", result.offset_seconds)
+            elif cfg_type == "camera-imu-synced":
+                result = ImuSynchronizedSensorConfig()
+                result.sensor_sync_column = cfg["sensor_sync_column"]
+            elif cfg_type == "joint-synced":
+                result = JointSynchronizedSensorConfig()
+                result.sync_joint_name = cfg["sync_joint_name"]
+                result.sensor_sync_axes = cfg["sensor_sync_axes"]
+                result.joint_sync_axis = cfg["joint_sync_axis"]
+            else:
+                raise ValueError(f"Unknown sensor config type {cfg_type}")
 
-    for name, cfg in config_dict.items():
-        cfg_type = cfg["type"]
-        if cfg_type == "manually-synced":
-            result = ManuallySynchronizedSensorConfig()
-            result.offset_seconds = cfg.get("offset_seconds", result.offset_seconds)
-        elif cfg_type == "camera-imu-synced":
-            result = CameraImuVideoConfig()
-            result.imu_path = cfg["imu_path"]
-            result.sync_column = cfg["sync_column"]
-        elif cfg_type == "joint-synced":
-            result = JointSynchronizedSensorConfig()
-            result.sync_joint_name = cfg["sync_joint_name"]
-            result.sync_axis_column = cfg["sync_axis_column"]
-            result.joint_sync_axis = cfg["joint_sync_axis"]
-        else:
-            raise ValueError(f"Unknown sensor config type {cfg_type}")
+            if "start_time" in cfg:
+                result.start_time = pd.to_datetime(cfg["start_time"])
+            if "end_time" in cfg:
+                result.end_time = pd.to_datetime(cfg["end_time"])
 
-        if "start_time" in cfg:
-            result.start_time = pd.to_datetime(cfg["start_time"])
-        if "end_time" in cfg:
-            result.end_time = pd.to_datetime(cfg["end_time"])
-
-        result_dict[name] = result
+            result.path = cfg["path"]
+            result_dict[str(i)] = result
+    except KeyError as e:
+        raise KeyError(f"Missing key '{e.args[0]}' in sensor config {i}: {pformat(cfg)}")
 
     return result_dict
 

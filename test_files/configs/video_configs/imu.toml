@@ -1,4 +1,5 @@
 [[video]]
 path = "test_files/kinect.mkv"
 type = "imu"
-imu_path = "test_files/imu.csv.gz"
+imu_path = "test_files/kinect_imu.csv.gz"
+camera_imu_sync_column = ["AX", "Accel Y"]

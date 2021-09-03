@@ -1,0 +1,4 @@
+[[sensor]]
+type = "camera-imu-synced"
+sensor_sync_column = "AccX"
+path = "test_files/camera_imu.csv.gz"
