@@ -1,0 +1,3 @@
+[[video]]
+path = "test_files/kinect.mkv"
+type = "raw"

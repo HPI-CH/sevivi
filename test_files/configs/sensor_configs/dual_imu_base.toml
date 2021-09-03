@@ -1,0 +1,8 @@
+# this is an object so that we don't get problems merging multiple files configuring a single sensor
+[[sensor-data.imu-1]]
+path = "test_files/data/imu1.csv.gz"
+offset_seconds = 0.123
+
+[[sensor-data.imu-2]]
+path = "test_files/data/imu2.csv.gz"
+offset_seconds = 123.1

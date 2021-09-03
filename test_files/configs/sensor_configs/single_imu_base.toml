@@ -1,0 +1,4 @@
+# this is an object so that we don't get problems merging multiple files configuring a single sensor
+[[sensor-data.imu-1]]
+type = "manually-synced"
+path = "test_files/data/imu1.csv.gz"
