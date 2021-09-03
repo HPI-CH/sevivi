@@ -13,21 +13,22 @@ from sevivi.config.config_types.video_config import CameraImuVideoConfig, Kinect
     OpenPoseVideoConfig
 
 
-def merge_config_files(config_file_paths: Optional[Tuple[str, ...]] = None) -> Dict:
+def merge_config_files(config_file_paths: Tuple[str, ...]) -> Dict:
     config_dict = {}
-
-    if config_file_paths is None:
-        config_file_paths = ()
 
     for path in config_file_paths:
         if not os.path.exists(path):
             raise FileNotFoundError(f"Missing configuration file {path}")
         else:
-            deep_update(config_dict, toml.load(path))
+            update = toml.load(path)
+            deep_update(config_dict, update)
     return config_dict
 
 
-def read_configs(config_file_paths: Optional[Tuple[str, ...]] = None) -> Config:
+def read_configs(config_file_paths: Tuple[str, ...]) -> Config:
+    if config_file_paths is None or len(config_file_paths) == 0:
+        raise ValueError("At least one config file is required to set video and data sources")
+
     config_dict = merge_config_files(config_file_paths)
     config = Config()
 
@@ -66,7 +67,7 @@ def deep_update(source, overrides):
     https://stackoverflow.com/a/18394648
     https://stackoverflow.com/a/30655448
     """
-    for key, value in overrides.iteritems():
+    for key, value in overrides.items():
         if isinstance(value, collections.Mapping) and value:
             returned = deep_update(source.get(key, {}), value)
             source[key] = returned

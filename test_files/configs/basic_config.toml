@@ -2,4 +2,4 @@ stacking_direction = "horizontal"
 draw_ticks = false
 add_magnitude = false
 use_parallel_image_ingestion = true
-plotting_method = "moving_vline"
+plotting_method = "moving_vertical_line"

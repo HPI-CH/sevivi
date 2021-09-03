@@ -1,8 +1,7 @@
-from copy import deepcopy
-
 import os
 import pytest
-from sevivi.config import config_reader, Config
+from sevivi.config import config_reader, PlottingMethod, StackingDirection
+from sevivi.config.config_reader import deep_update
 
 
 @pytest.fixture(scope="function")
@@ -13,44 +12,60 @@ def run_in_repo_root(request):
     os.chdir(request.config.invocation_dir)
 
 
-def test_default_config():
+def test_zero_config():
     with pytest.raises(ValueError):
-        config_reader.read_configs()
+        # noinspection PyTypeChecker
+        config_reader.read_configs(None)
+    with pytest.raises(ValueError):
+        config_reader.read_configs(())
 
 
 def test_missing_config_file():
     with pytest.raises(FileNotFoundError):
+        config_reader.merge_config_files(("lnjaerovfgnaeorcin",))
+    with pytest.raises(FileNotFoundError):
         config_reader.read_configs(("lnjaerovfgnaeorcin",))
 
 
-def test_single_config(run_in_repo_root):
-    assert config_reader.read_configs(("test_files/configs/basic_config.toml",)) is not None
+def test_single_config_file(run_in_repo_root):
+    assert config_reader.merge_config_files(("test_files/configs/basic_config.toml",)) is not None
+
+
+def test_multi_config(run_in_repo_root):
+    config = config_reader.merge_config_files(("test_files/configs/basic_config.toml",))
+    config_multi = config_reader.merge_config_files((
+        "test_files/configs/basic_config.toml",
+        "test_files/configs/basic_config.toml",
+    ))
+    assert config == config_multi
+
+    config_parallel_ingest = config_reader.merge_config_files((
+        "test_files/configs/basic_config.toml",
+        "test_files/configs/use_parallel_ingestion.toml",
+    ))
+    assert config_parallel_ingest["use_parallel_image_ingestion"] is True
 
 
 def test_get_bool(run_in_repo_root):
-    assert config_reader.get_bool("use_parallel_image_ingestion")
-    non_default_config = ("test_files/configs/bool_false.toml",)
-    assert not ConfigReader(non_default_config).get_bool("use_parallel_image_ingestion")
-
-    with pytest.raises(KeyError):
-        ConfigReader().get_bool("N/A")
+    config = config_reader.merge_config_files((
+        "test_files/configs/basic_config.toml",
+        "test_files/configs/use_parallel_ingestion.toml",
+    ))
+    assert config_reader.get_bool(config, "use_parallel_image_ingestion") is True
 
 
 def test_plotting_method(run_in_repo_root):
-    assert ConfigReader().get_plotting_method() == PlottingMethod.MOVING_VERTICAL_LINE
-    non_default_config = ("test_files/configs/push_in_plotting_method.toml",)
-    assert (
-            ConfigReader(non_default_config).get_plotting_method() == PlottingMethod.PUSH_IN
-    )
+    config = config_reader.merge_config_files(("test_files/configs/basic_config.toml",))
+    assert config_reader.get_plotting_method(config) == PlottingMethod.MOVING_VERTICAL_LINE
+    config = config_reader.merge_config_files(("test_files/configs/push_in_plotting_method.toml",))
+    assert config_reader.get_plotting_method(config) == PlottingMethod.PUSH_IN
 
 
 def test_stack_direction(run_in_repo_root):
-    assert ConfigReader().get_stacking_direction() == StackingDirection.HORIZONTAL
-    non_default_config = ("test_files/configs/vertical_stacking.toml",)
-    assert (
-            ConfigReader(non_default_config).get_stacking_direction()
-            == StackingDirection.VERTICAL
-    )
+    config = config_reader.merge_config_files(("test_files/configs/basic_config.toml",))
+    assert config_reader.get_stacking_direction(config) == StackingDirection.HORIZONTAL
+    config = config_reader.merge_config_files(("test_files/configs/vertical_stacking.toml",))
+    assert config_reader.get_stacking_direction(config) == StackingDirection.VERTICAL
 
 
 def test_deep_update():
