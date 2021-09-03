@@ -3,9 +3,10 @@ from enum import Enum
 
 class PlottingMethod(Enum):
     """The plotting method to use"""
+
     MOVING_VERTICAL_LINE = 0
     """
-    The MOVING_VERTICAL_LINE plotting method is the fastest. 
+    The MOVING_VERTICAL_LINE plotting method is the fastest.
     The entire graph is shown for the entire video.
     A vertical line is moved through the graph to show the current moment in time.
     """

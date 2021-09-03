@@ -7,11 +7,19 @@ import pandas as pd
 import toml
 
 from sevivi.config import PlottingMethod, Config, VideoConfig
-from sevivi.config.config_types.sensor_config import SensorConfig, ManuallySynchronizedSensorConfig, \
-    JointSynchronizedSensorConfig, ImuSynchronizedSensorConfig
+from sevivi.config.config_types.sensor_config import (
+    SensorConfig,
+    ManuallySynchronizedSensorConfig,
+    JointSynchronizedSensorConfig,
+    ImuSynchronizedSensorConfig,
+)
 from sevivi.config.config_types.stacking_direction import StackingDirection
-from sevivi.config.config_types.video_config import CameraImuVideoConfig, KinectVideoConfig, RawVideoConfig, \
-    OpenPoseVideoConfig
+from sevivi.config.config_types.video_config import (
+    CameraImuVideoConfig,
+    KinectVideoConfig,
+    RawVideoConfig,
+    OpenPoseVideoConfig,
+)
 
 
 def merge_config_files(config_file_paths: Tuple[str, ...]) -> Dict:
@@ -28,7 +36,9 @@ def merge_config_files(config_file_paths: Tuple[str, ...]) -> Dict:
 
 def read_configs(config_file_paths: Tuple[str, ...]) -> Config:
     if config_file_paths is None or len(config_file_paths) == 0:
-        raise ValueError("At least one config file is required to set video and data sources")
+        raise ValueError(
+            "At least one config file is required to set video and data sources"
+        )
 
     config_dict = merge_config_files(config_file_paths)
     config = Config()
@@ -38,7 +48,9 @@ def read_configs(config_file_paths: Tuple[str, ...]) -> Config:
     if "add_magnitude" in config_dict:
         config.add_magnitude = get_bool(config_dict, "add_magnitude")
     if "use_parallel_image_ingestion" in config_dict:
-        config.use_parallel_image_ingestion = get_bool(config_dict, "use_parallel_image_ingestion")
+        config.use_parallel_image_ingestion = get_bool(
+            config_dict, "use_parallel_image_ingestion"
+        )
 
     if "plotting_method" in config_dict:
         config.plotting_method = get_plotting_method(config_dict)
@@ -48,12 +60,16 @@ def read_configs(config_file_paths: Tuple[str, ...]) -> Config:
     if "video" in config_dict:
         config.video_config = get_video_config(config_dict)
     else:
-        raise ValueError("Missing video parameter. You need to supply a video to render next to.")
+        raise ValueError(
+            "Missing video parameter. You need to supply a video to render next to."
+        )
 
     if "sensor" in config_dict:
         config.data_configs = get_sensor_configs(config_dict)
     else:
-        raise ValueError("Missing Video parameter. You need to supply a video to render next to.")
+        raise ValueError(
+            "Missing Video parameter. You need to supply a video to render next to."
+        )
 
     return config
 
@@ -73,7 +89,7 @@ def deep_update(source, overrides):
             returned = deep_update(source.get(key, {}), value)
             source[key] = returned
         elif isinstance(value, list):
-            source[key] = (source.get(key, []) + value)
+            source[key] = source.get(key, []) + value
         else:
             source[key] = overrides[key]
     return source
@@ -132,7 +148,9 @@ def get_sensor_configs(config_dict: Dict) -> Dict[str, SensorConfig]:
             result.path = cfg["path"]
             result_dict[str(i)] = result
     except KeyError as e:
-        raise KeyError(f"Missing key '{e.args[0]}' in sensor config {i}: {pformat(cfg)}")
+        raise KeyError(
+            f"Missing key '{e.args[0]}' in sensor config {i}: {pformat(cfg)}"
+        )
 
     return result_dict
 

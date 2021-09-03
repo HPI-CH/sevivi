@@ -5,10 +5,18 @@ import pandas as pd
 import pytest
 from sevivi.config import config_reader, PlottingMethod, StackingDirection, VideoConfig
 from sevivi.config.config_reader import deep_update
-from sevivi.config.config_types.sensor_config import SensorConfig, ManuallySynchronizedSensorConfig, \
-    JointSynchronizedSensorConfig, ImuSynchronizedSensorConfig
-from sevivi.config.config_types.video_config import CameraImuVideoConfig, KinectVideoConfig, OpenPoseVideoConfig, \
-    RawVideoConfig
+from sevivi.config.config_types.sensor_config import (
+    SensorConfig,
+    ManuallySynchronizedSensorConfig,
+    JointSynchronizedSensorConfig,
+    ImuSynchronizedSensorConfig,
+)
+from sevivi.config.config_types.video_config import (
+    CameraImuVideoConfig,
+    KinectVideoConfig,
+    OpenPoseVideoConfig,
+    RawVideoConfig,
+)
 
 
 @pytest.fixture(scope="function")
@@ -20,13 +28,15 @@ def run_in_repo_root(request):
 
 
 def test_combination(run_in_repo_root):
-    config = config_reader.read_configs((
-        "test_files/configs/basic_config.toml",
-        "test_files/configs/video_configs/kinect.toml",
-        "test_files/configs/sensor_configs/camera_imu_synchronization.toml",
-        "test_files/configs/sensor_configs/joint_synchronization.toml",
-        "test_files/configs/sensor_configs/manual_synchronization.toml",
-    ))
+    config = config_reader.read_configs(
+        (
+            "test_files/configs/basic_config.toml",
+            "test_files/configs/video_configs/kinect.toml",
+            "test_files/configs/sensor_configs/camera_imu_synchronization.toml",
+            "test_files/configs/sensor_configs/joint_synchronization.toml",
+            "test_files/configs/sensor_configs/manual_synchronization.toml",
+        )
+    )
     print(config)
 
 
@@ -68,7 +78,9 @@ def test_get_bool(run_in_repo_root):
 
 def test_plotting_method(run_in_repo_root):
     config = _conf_dict("basic_config")
-    assert config_reader.get_plotting_method(config) == PlottingMethod.MOVING_VERTICAL_LINE
+    assert (
+        config_reader.get_plotting_method(config) == PlottingMethod.MOVING_VERTICAL_LINE
+    )
 
     config = _conf_dict("push_in_plotting_method")
     assert config_reader.get_plotting_method(config) == PlottingMethod.PUSH_IN
@@ -151,7 +163,7 @@ def test_camera_sync_imu(run_in_repo_root):
     assert len(conf) == 1
     conf = conf["0"]
     assert isinstance(conf, ImuSynchronizedSensorConfig)
-    assert conf.sensor_sync_column == ['AccX', 'Accel Y']
+    assert conf.sensor_sync_column == ["AccX", "Accel Y"]
     assert conf.path == "test_files/camera_imu.csv.gz"
 
 
@@ -204,12 +216,16 @@ def test_video_missing_attributes(run_in_repo_root):
 
 def _vid_conf(*names: str) -> VideoConfig:
     files = [f"test_files/configs/video_configs/{name}.toml" for name in names]
-    return config_reader.get_video_config(config_reader.merge_config_files(tuple(files)))
+    return config_reader.get_video_config(
+        config_reader.merge_config_files(tuple(files))
+    )
 
 
 def _sensor_conf(*names: str) -> Dict[str, SensorConfig]:
     files = [f"test_files/configs/sensor_configs/{name}.toml" for name in names]
-    return config_reader.get_sensor_configs(config_reader.merge_config_files(tuple(files)))
+    return config_reader.get_sensor_configs(
+        config_reader.merge_config_files(tuple(files))
+    )
 
 
 def _conf_dict(*names: str) -> Dict:
@@ -224,27 +240,27 @@ def test_deep_update():
     https://stackoverflow.com/a/18394648
     https://stackoverflow.com/a/30655448
     """
-    source = {'hello1': 1}
-    overrides = {'hello2': 2}
+    source = {"hello1": 1}
+    overrides = {"hello2": 2}
     deep_update(source, overrides)
-    assert source == {'hello1': 1, 'hello2': 2}
+    assert source == {"hello1": 1, "hello2": 2}
 
-    source = {'hello': 'to_override'}
-    overrides = {'hello': 'over'}
+    source = {"hello": "to_override"}
+    overrides = {"hello": "over"}
     deep_update(source, overrides)
-    assert source == {'hello': 'over'}
+    assert source == {"hello": "over"}
 
-    source = {'hello': {'value': 'to_override', 'no_change': 1}}
-    overrides = {'hello': {'value': 'over'}}
+    source = {"hello": {"value": "to_override", "no_change": 1}}
+    overrides = {"hello": {"value": "over"}}
     deep_update(source, overrides)
-    assert source == {'hello': {'value': 'over', 'no_change': 1}}
+    assert source == {"hello": {"value": "over", "no_change": 1}}
 
-    source = {'hello': {'value': 'to_override', 'no_change': 1}}
-    overrides = {'hello': {'value': {}}}
+    source = {"hello": {"value": "to_override", "no_change": 1}}
+    overrides = {"hello": {"value": {}}}
     deep_update(source, overrides)
-    assert source == {'hello': {'value': {}, 'no_change': 1}}
+    assert source == {"hello": {"value": {}, "no_change": 1}}
 
-    source = {'hello': {'value': {}, 'no_change': 1}}
-    overrides = {'hello': {'value': 2}}
+    source = {"hello": {"value": {}, "no_change": 1}}
+    overrides = {"hello": {"value": 2}}
     deep_update(source, overrides)
-    assert source == {'hello': {'value': 2, 'no_change': 1}}
+    assert source == {"hello": {"value": 2, "no_change": 1}}

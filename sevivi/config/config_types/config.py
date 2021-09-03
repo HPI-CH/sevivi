@@ -9,6 +9,7 @@ from sevivi.config.config_types.stacking_direction import StackingDirection
 @dataclass
 class Config:
     """Typed configuration for the entire tool."""
+
     video_config: VideoConfig = None
     data_configs: List[SensorConfig] = field(default_factory=list)
     stacking_direction: StackingDirection = StackingDirection.HORIZONTAL

@@ -7,9 +7,10 @@ import pandas as pd
 
 class SyncJointAxis(Enum):
     """This enum specifies the axis of a joint that a sensor should be synchronized to."""
-    ACCELERATION_X = 0,
-    ACCELERATION_Y = 1,
-    ACCELERATION_Z = 2,
+
+    ACCELERATION_X = (0,)
+    ACCELERATION_Y = (1,)
+    ACCELERATION_Z = (2,)
     ACCELERATION_MAG = 3
 
 
@@ -18,6 +19,7 @@ class SensorConfig:
     """
     SensorConfig instances allow specifying the data taken and synchronized from sensors.
     """
+
     path: str = None
     """Path to the sensor data csv"""
     start_time: Optional[pd.Timestamp] = None
@@ -31,6 +33,7 @@ class ManuallySynchronizedSensorConfig(SensorConfig):
     """
     This SensorConfig provides the information necessary to synchronize a sensor manually
     """
+
     offset_seconds: float = 0.0
     """Offset the select data chunk, or the entire graph data, by this number of seconds"""
 
