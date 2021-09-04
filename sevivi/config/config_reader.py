@@ -1,62 +1,183 @@
-import copy
+import collections
 import os
-from typing import List, Tuple, Optional
+from pprint import pprint, pformat
+from typing import Tuple, Optional, Dict
 
+import pandas as pd
 import toml
 
-from sevivi.config import PlottingMethod, StackingDirection
+from sevivi.config import PlottingMethod, Config, VideoConfig
+from sevivi.config.config_types.sensor_config import (
+    SensorConfig,
+    ManuallySynchronizedSensorConfig,
+    JointSynchronizedSensorConfig,
+    ImuSynchronizedSensorConfig,
+)
+from sevivi.config.config_types.stacking_direction import StackingDirection
+from sevivi.config.config_types.video_config import (
+    CameraImuVideoConfig,
+    KinectVideoConfig,
+    RawVideoConfig,
+    OpenPoseVideoConfig,
+)
 
-default_config = {
-    "show_peak_finding_plots": False,
-    "stacking_direction": "horizontal",
-    "draw_ticks": False,
-    "add_magnitude": False,
-    "add_events": True,
-    "add_gyroscope": True,
-    "use_parallel_image_ingestion": True,
-    "plotting_method": "MOVING_VERTICAL_LINE",
-}
 
+def merge_config_files(config_file_paths: Tuple[str, ...]) -> Dict:
+    config_dict = {}
 
-class ConfigReader:
-    def __init__(self, config_file_paths: Optional[Tuple[str, ...]] = None):
-        self.config = ConfigReader.read_configs(config_file_paths)
-
-    @staticmethod
-    def read_configs(config_file_paths: Optional[Tuple[str, ...]] = None):
-        config = copy.deepcopy(default_config)
-
-        if config_file_paths is None:
-            config_file_paths = ()
-
-        for path in config_file_paths:
-            if not os.path.exists(path):
-                raise FileNotFoundError(f"Missing configuration file {path}")
-            else:
-                config.update(toml.load(path))
-        return config
-
-    def get_bool(self, key_name: str) -> bool:
-        value = self.config[key_name]
-        if isinstance(value, bool):
-            return value
+    for path in config_file_paths:
+        if not os.path.exists(path):
+            raise FileNotFoundError(f"Missing configuration file {path}")
         else:
-            raise ValueError(
-                f"Configuration value {value} for key {key_name} is not a boolean"
-            )
+            update = toml.load(path)
+            deep_update(config_dict, update)
+    return config_dict
 
-    def get_plotting_method(self) -> PlottingMethod:
-        config_plotting_method = self.config.get("plotting_method", "N/A")
-        try:
-            return PlottingMethod[config_plotting_method.upper()]
-        except KeyError:
-            raise KeyError(f"Could not parse plotting_method {config_plotting_method}")
 
-    def get_stacking_direction(self) -> StackingDirection:
-        config_stacking_direction = self.config.get("stacking_direction", "N/A")
-        try:
-            return StackingDirection[config_stacking_direction.upper()]
-        except KeyError:
-            raise KeyError(
-                f"Could not parse stacking_direction {config_stacking_direction}"
-            )
+def read_configs(config_file_paths: Tuple[str, ...]) -> Config:
+    if config_file_paths is None or len(config_file_paths) == 0:
+        raise ValueError(
+            "At least one config file is required to set video and data sources"
+        )
+
+    config_dict = merge_config_files(config_file_paths)
+    config = Config()
+
+    if "draw_ticks" in config_dict:
+        config.draw_ticks = get_bool(config_dict, "draw_ticks")
+    if "add_magnitude" in config_dict:
+        config.add_magnitude = get_bool(config_dict, "add_magnitude")
+    if "use_parallel_image_ingestion" in config_dict:
+        config.use_parallel_image_ingestion = get_bool(
+            config_dict, "use_parallel_image_ingestion"
+        )
+
+    if "plotting_method" in config_dict:
+        config.plotting_method = get_plotting_method(config_dict)
+    if "stacking_direction" in config_dict:
+        config.stacking_direction = get_stacking_direction(config_dict)
+
+    if "video" in config_dict:
+        config.video_config = get_video_config(config_dict)
+    else:
+        raise ValueError(
+            "Missing video parameter. You need to supply a video to render next to."
+        )
+
+    if "sensor" in config_dict:
+        config.data_configs = get_sensor_configs(config_dict)
+    else:
+        raise ValueError(
+            "Missing Video parameter. You need to supply a video to render next to."
+        )
+
+    return config
+
+
+def deep_update(source, overrides):
+    """
+    Update a nested dictionary or similar mapping.
+    Modify ``source`` in place.
+
+    From Nate Glenn, user2709610, charlax, surjikal
+
+    https://stackoverflow.com/a/18394648
+    https://stackoverflow.com/a/30655448
+    """
+    for key, value in overrides.items():
+        if isinstance(value, collections.Mapping) and value:
+            returned = deep_update(source.get(key, {}), value)
+            source[key] = returned
+        elif isinstance(value, list):
+            source[key] = source.get(key, []) + value
+        else:
+            source[key] = overrides[key]
+    return source
+
+
+def get_video_config(cfg: Dict) -> VideoConfig:
+    try:
+        cfg = cfg["video"][0]
+        cfg_type = cfg["type"]
+        if cfg_type == "imu":
+            result = CameraImuVideoConfig()
+            result.imu_path = cfg["imu_path"]
+            result.camera_imu_sync_column = cfg["camera_imu_sync_column"]
+        elif cfg_type == "kinect":
+            result = KinectVideoConfig()
+            result.skeleton_path = cfg["skeleton_path"]
+        elif cfg_type == "raw":
+            result = RawVideoConfig()
+        elif cfg_type == "openpose":
+            result = OpenPoseVideoConfig()
+        else:
+            raise ValueError(f"Unknown video config type {cfg_type}")
+
+        result.path = cfg["path"]
+    except KeyError as e:
+        raise KeyError(f"Missing key '{e.args[0]}' in video config: {pformat(cfg)}")
+    return result
+
+
+def get_sensor_configs(config_dict: Dict) -> Dict[str, SensorConfig]:
+    result_dict = {}
+    i, cfg = None, None
+    try:
+        config_dict = config_dict["sensor"]
+        for i, cfg in enumerate(config_dict):
+            cfg_type = cfg["type"]
+            if cfg_type == "manually-synced":
+                result = ManuallySynchronizedSensorConfig()
+                result.offset_seconds = cfg.get("offset_seconds", result.offset_seconds)
+            elif cfg_type == "camera-imu-synced":
+                result = ImuSynchronizedSensorConfig()
+                result.sensor_sync_column = cfg["sensor_sync_column"]
+            elif cfg_type == "joint-synced":
+                result = JointSynchronizedSensorConfig()
+                result.sync_joint_name = cfg["sync_joint_name"]
+                result.sensor_sync_axes = cfg["sensor_sync_axes"]
+                result.joint_sync_axis = cfg["joint_sync_axis"]
+            else:
+                raise ValueError(f"Unknown sensor config type {cfg_type}")
+
+            if "start_time" in cfg:
+                result.start_time = pd.to_datetime(cfg["start_time"])
+            if "end_time" in cfg:
+                result.end_time = pd.to_datetime(cfg["end_time"])
+
+            result.path = cfg["path"]
+            result_dict[str(i)] = result
+    except KeyError as e:
+        raise KeyError(
+            f"Missing key '{e.args[0]}' in sensor config {i}: {pformat(cfg)}"
+        )
+
+    return result_dict
+
+
+def get_bool(config_dict: Dict, key_name: str) -> bool:
+    value = config_dict[key_name]
+    if isinstance(value, bool):
+        return value
+    else:
+        raise ValueError(
+            f"Configuration value {value} for key {key_name} is not a boolean"
+        )
+
+
+def get_plotting_method(config_dict: Dict) -> PlottingMethod:
+    config_plotting_method = config_dict.get("plotting_method", "N/A")
+    try:
+        return PlottingMethod[config_plotting_method.upper()]
+    except KeyError:
+        raise KeyError(f"Could not parse plotting_method {config_plotting_method}")
+
+
+def get_stacking_direction(config_dict: Dict) -> StackingDirection:
+    config_stacking_direction = config_dict.get("stacking_direction", "N/A")
+    try:
+        return StackingDirection[config_stacking_direction.upper()]
+    except KeyError:
+        raise KeyError(
+            f"Could not parse stacking_direction {config_stacking_direction}"
+        )

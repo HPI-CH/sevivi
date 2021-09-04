@@ -1,0 +1,5 @@
+[[sensor]]
+start_time = "00:00:00.000000"
+end_time = "00:00:01.000000"
+type = "manually-synced"
+path = "test_files/data/imu1.csv.gz"

@@ -1,0 +1,4 @@
+[[sensor]]
+offset_seconds = 123.4
+type = "manually-synced"
+path = "test_files/manual_imu.csv.gz"

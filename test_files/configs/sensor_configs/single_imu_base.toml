@@ -1,0 +1,3 @@
+[[sensor]]
+type = "manually-synced"
+path = "test_files/data/imu1.csv.gz"
