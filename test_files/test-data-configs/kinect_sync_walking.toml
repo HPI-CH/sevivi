@@ -1,0 +1,18 @@
+[[video]]
+type = "kinect"
+path = "test_files/videos/joint_synchronization_walking.mp4"
+skeleton_path = "test_files/skeletons/joint_synchronization_walking/positions_3d.csv.gz"
+
+[[sensor]]
+type = "joint-synced"
+sync_joint_name = "CHEST"
+sensor_sync_axes = ["Acc_X", "Acc_Y", "Acc_Z"]
+joint_sync_axis = "ACCELERATION_MAG"
+path = "test_files/sensors/joint_synchronization_walking/LF.csv.gz"
+
+[[sensor]]
+type = "joint-synced"
+sync_joint_name = "ANKLE_RIGHT"
+sensor_sync_axes = ["Acc_X", "Acc_Y", "Acc_Z"]
+joint_sync_axis = "ACCELERATION_MAG"
+path = "test_files/sensors/joint_synchronization_walking/RF.csv.gz"
