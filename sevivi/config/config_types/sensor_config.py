@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass
 from enum import Enum
 from typing import Optional, Union, List
@@ -26,6 +27,12 @@ class SensorConfig:
     """Start time of the sensor data. This is useful to select a portion of data from a longer recording"""
     end_time: Optional[pd.Timestamp] = None
     """End time of the sensor data. This is useful to select a portion of data from a longer recording"""
+
+    def get_missing_files(self) -> List[str]:
+        """Returns a list of all missing files for this config"""
+        if not os.path.isfile(self.path):
+            return [self.path]
+        return []
 
 
 @dataclass

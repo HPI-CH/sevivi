@@ -1,0 +1,3 @@
+[[video]]
+path = "test_files/this_file_is_missing_and_not_there.mkv"
+type = "raw"
