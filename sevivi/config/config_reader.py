@@ -65,7 +65,7 @@ def read_configs(config_file_paths: Tuple[str, ...]) -> Config:
         )
 
     if "sensor" in config_dict:
-        config.data_configs = get_sensor_configs(config_dict)
+        config.sensor_configs = get_sensor_configs(config_dict)
     else:
         raise ValueError(
             "Missing Video parameter. You need to supply a video to render next to."

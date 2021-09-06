@@ -11,7 +11,7 @@ class Config:
     """Typed configuration for the entire tool."""
 
     video_config: VideoConfig = None
-    data_configs: List[SensorConfig] = field(default_factory=list)
+    sensor_configs: List[SensorConfig] = field(default_factory=list)
     stacking_direction: StackingDirection = StackingDirection.HORIZONTAL
     plotting_method: PlottingMethod = PlottingMethod.MOVING_VERTICAL_LINE
     parallel_image_ingestion: bool = False

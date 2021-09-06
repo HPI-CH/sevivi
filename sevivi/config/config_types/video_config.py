@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass
 from typing import Union, List
 
@@ -11,6 +12,11 @@ class VideoConfig:
     path: str = None
     """Path to the video file. May be absolute or relative"""
 
+    def get_missing_files(self) -> List[str]:
+        """Returns a list of all missing files for this config"""
+        if not os.path.isfile(self.path):
+            return [self.path]
+
 
 @dataclass
 class RawVideoConfig(VideoConfig):
@@ -23,6 +29,13 @@ class KinectVideoConfig(VideoConfig):
 
     skeleton_path: str = None
     """Path to the skeleton extract from the kinect video"""
+
+    def get_missing_files(self) -> List[str]:
+        """Returns a list of all missing files for this config"""
+        missing_files = super().get_missing_files()
+        if not os.path.isfile(self.skeleton_path):
+            missing_files.append(self.skeleton_path)
+        return missing_files
 
 
 @dataclass
@@ -38,6 +51,13 @@ class CameraImuVideoConfig(VideoConfig):
     If a list given, the magnitude of the listed columns will be used.
     All of the sensors will be synchronized to these columns.
     """
+
+    def get_missing_files(self) -> List[str]:
+        """Returns true if all files for this config exist"""
+        missing_files = super().get_missing_files()
+        if not os.path.isfile(self.imu_path):
+            missing_files.append(self.imu_path)
+        return missing_files
 
 
 @dataclass
