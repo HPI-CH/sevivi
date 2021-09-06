@@ -1,0 +1,13 @@
+[[video]]
+type = "raw"
+path = "test_files/videos/joint_synchronization_walking.mp4"
+
+[[sensor]]
+offset_seconds = 123.4
+type = "manually-synced"
+path = "test_files/sensors/joint_synchronization_walking/LF.csv.gz"
+
+[[sensor]]
+offset_seconds = -12.2
+type = "manually-synced"
+path = "test_files/sensors/joint_synchronization_walking/RF.csv.gz"
