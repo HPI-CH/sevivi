@@ -1,5 +1,4 @@
-import os
-from typing import Dict, List
+from typing import Dict
 
 import pandas as pd
 import pytest
@@ -19,16 +18,8 @@ from sevivi.config.config_types.video_config import (
 )
 
 
-@pytest.fixture(scope="function")
-def run_in_repo_root(request):
-    if os.getcwd().endswith("tests"):
-        os.chdir("..")
-    yield
-    os.chdir(request.config.invocation_dir)
-
-
 def test_combination(run_in_repo_root):
-    config = config_reader.read_configs(
+    config_reader.read_configs(
         (
             "test_files/configs/basic_config.toml",
             "test_files/configs/video_configs/kinect.toml",
@@ -37,7 +28,6 @@ def test_combination(run_in_repo_root):
             "test_files/configs/sensor_configs/manual_synchronization.toml",
         )
     )
-    print(config)
 
 
 def test_zero_config():
@@ -264,3 +254,34 @@ def test_deep_update():
     overrides = {"hello": {"value": 2}}
     deep_update(source, overrides)
     assert source == {"hello": {"value": 2, "no_change": 1}}
+
+
+def test_multi_video_config(run_in_repo_root):
+    config_reader.read_configs(
+        (
+            "test_files/configs/basic_config.toml",
+            "test_files/configs/video_configs/kinect.toml",
+            "test_files/configs/video_configs/kinect.toml",
+            "test_files/configs/sensor_configs/camera_imu_synchronization.toml",
+        )
+    )
+
+
+def test_missing_video_config(run_in_repo_root):
+    with pytest.raises(ValueError):
+        config_reader.read_configs(
+            (
+                "test_files/configs/basic_config.toml",
+                "test_files/configs/sensor_configs/camera_imu_synchronization.toml",
+            )
+        )
+
+
+def test_missing_sensor_config(run_in_repo_root):
+    with pytest.raises(ValueError):
+        config_reader.read_configs(
+            (
+                "test_files/configs/basic_config.toml",
+                "test_files/configs/video_configs/kinect.toml",
+            )
+        )

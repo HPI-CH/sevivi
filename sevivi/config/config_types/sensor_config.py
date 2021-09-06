@@ -32,6 +32,7 @@ class SensorConfig:
         """Returns a list of all missing files for this config"""
         if not os.path.isfile(self.path):
             return [self.path]
+        return []
 
 
 @dataclass

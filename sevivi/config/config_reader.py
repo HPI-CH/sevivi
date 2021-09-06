@@ -1,7 +1,8 @@
 import collections
+import logging
 import os
-from pprint import pprint, pformat
-from typing import Tuple, Optional, Dict
+from pprint import pformat
+from typing import Tuple, Dict
 
 import pandas as pd
 import toml
@@ -21,6 +22,8 @@ from sevivi.config.config_types.video_config import (
     OpenPoseVideoConfig,
 )
 
+logger = logging.getLogger("sevivi.config_reader")
+
 
 def merge_config_files(config_file_paths: Tuple[str, ...]) -> Dict:
     config_dict = {}
@@ -30,6 +33,15 @@ def merge_config_files(config_file_paths: Tuple[str, ...]) -> Dict:
             raise FileNotFoundError(f"Missing configuration file {path}")
         else:
             update = toml.load(path)
+
+            # In theory we could manually merge the video configurations;
+            # However, I can't really think of a use case. The behaviour for
+            # sensors is to just add all configured sensors together, which
+            # is not wanted for video config.
+            if "video" in update and "video" in config_dict:
+                logger.info("Only the latest video config is used")
+                del config_dict["video"]
+
             deep_update(config_dict, update)
     return config_dict
 
@@ -61,14 +73,16 @@ def read_configs(config_file_paths: Tuple[str, ...]) -> Config:
         config.video_config = get_video_config(config_dict)
     else:
         raise ValueError(
-            "Missing video parameter. You need to supply a video to render next to."
+            "Missing video parameter. "
+            "You need to supply a video to render the graphs next to."
         )
 
     if "sensor" in config_dict:
         config.sensor_configs = get_sensor_configs(config_dict)
     else:
         raise ValueError(
-            "Missing Video parameter. You need to supply a video to render next to."
+            "Missing sensor parameters. "
+            "You need to supply at least one sensor to render next to the video."
         )
 
     return config
