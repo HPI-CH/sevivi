@@ -154,7 +154,7 @@ def test_camera_sync_imu(run_in_repo_root):
     conf = conf["0"]
     assert isinstance(conf, ImuSynchronizedSensorConfig)
     assert conf.sensor_sync_column == ["AccX", "Accel Y"]
-    assert conf.path == "test_files/camera_imu.csv.gz"
+    assert conf.path == "test_files/sensor_imu.csv.gz"
 
 
 def test_camera_sync_imu_single_col(run_in_repo_root):

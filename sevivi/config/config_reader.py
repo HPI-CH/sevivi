@@ -7,7 +7,7 @@ from typing import Tuple, Dict
 import pandas as pd
 import toml
 
-from sevivi.config import PlottingMethod, Config, VideoConfig
+from sevivi.config import PlottingMethod, Config, VideoConfig, RenderConfig
 from sevivi.config.config_types.sensor_config import (
     SensorConfig,
     ManuallySynchronizedSensorConfig,
@@ -53,21 +53,26 @@ def read_configs(config_file_paths: Tuple[str, ...]) -> Config:
         )
 
     config_dict = merge_config_files(config_file_paths)
-    config = Config()
+    render_config = RenderConfig()
 
+    if "target_file_path" in config_dict:
+        render_config.target_file_path = config_dict["target_file_path"]
     if "draw_ticks" in config_dict:
-        config.draw_ticks = get_bool(config_dict, "draw_ticks")
+        render_config.draw_ticks = get_bool(config_dict, "draw_ticks")
     if "add_magnitude" in config_dict:
-        config.add_magnitude = get_bool(config_dict, "add_magnitude")
+        render_config.add_magnitude = get_bool(config_dict, "add_magnitude")
     if "use_parallel_image_ingestion" in config_dict:
-        config.use_parallel_image_ingestion = get_bool(
+        render_config.use_parallel_image_ingestion = get_bool(
             config_dict, "use_parallel_image_ingestion"
         )
 
     if "plotting_method" in config_dict:
-        config.plotting_method = get_plotting_method(config_dict)
+        render_config.plotting_method = get_plotting_method(config_dict)
     if "stacking_direction" in config_dict:
-        config.stacking_direction = get_stacking_direction(config_dict)
+        render_config.stacking_direction = get_stacking_direction(config_dict)
+
+    config = Config()
+    config.render_config = render_config
 
     if "video" in config_dict:
         config.video_config = get_video_config(config_dict)
