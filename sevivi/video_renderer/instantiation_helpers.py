@@ -54,16 +54,19 @@ def instantiate_graph_providers(
     result = {}
 
     for name, sc in sensor_configs.items():
+        data = pd.read_csv(sc.path, index_col=0, parse_dates=True)
         if isinstance(sc, ManuallySynchronizedSensorConfig):
-            result[name] = ManuallySyncedGraphProvider(None)
+            result[name] = ManuallySyncedGraphProvider(
+                data, pd.Timedelta(seconds=sc.offset_seconds)
+            )
         elif isinstance(sc, ImuSynchronizedSensorConfig):
             result[name] = CameraImuSyncedGraphProvider(
-                pd.read_csv(sc.path, index_col=0, parse_dates=True),
+                data,
                 sc.sensor_sync_column,
             )
         elif isinstance(sc, JointSynchronizedSensorConfig):
             result[name] = JointSyncedGraphProvider(
-                pd.read_csv(sc.path, index_col=0, parse_dates=True),
+                data,
                 sc.sync_joint_name,
                 sc.sensor_sync_axes,
                 sc.joint_sync_axis,

@@ -1,1 +1,2 @@
 from .azure_image_provider import AzureProvider
+from .plain_video_image_provider import PlainVideoImageProvider

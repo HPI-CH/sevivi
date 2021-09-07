@@ -5,6 +5,7 @@ from sevivi.config.config_types.sensor_config import (
     ManuallySynchronizedSensorConfig,
     ImuSynchronizedSensorConfig,
     JointSynchronizedSensorConfig,
+    SensorConfig,
 )
 from sevivi.config.config_types.video_config import (
     CameraImuVideoConfig,
@@ -54,16 +55,20 @@ def test_instantiate_unknown_video_provider():
         instantiate_video_provider(3)
 
 
-def test_instantiate_unknown_graph_provider_config():
+def test_instantiate_unknown_graph_provider_config(run_in_repo_root):
     with pytest.raises(RuntimeError):
         # noinspection PyTypeChecker
-        instantiate_graph_providers({"1": 2})
+        instantiate_graph_providers(
+            {"1": SensorConfig("test_files/sensors/imu_synchronization/LF.csv.gz")}
+        )
 
 
 def test_instantiate_graph_providers(run_in_repo_root):
     # noinspection PyTypeChecker
     configs = {
-        "1": ManuallySynchronizedSensorConfig(path=None),
+        "1": ManuallySynchronizedSensorConfig(
+            path="test_files/sensors/imu_synchronization/LF.csv.gz"
+        ),
         "2": ImuSynchronizedSensorConfig(
             path="test_files/sensors/imu_synchronization/LF.csv.gz"
         ),

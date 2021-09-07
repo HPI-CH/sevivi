@@ -22,5 +22,8 @@ class AzureProvider(VideoImageProvider):
         length = int(self.__video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
         print(length)
 
-    def get_image_for_time_stamp(self):
+    def get_offset(self, graph_sync_df: pd.DataFrame) -> pd.Timedelta:
+        return pd.Timedelta(seconds=0)
+
+    def get_image_for_time_stamp(self, ts: pd.Timestamp):
         pass
