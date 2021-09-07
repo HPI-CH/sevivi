@@ -20,11 +20,11 @@ from sevivi.config.config_types.video_config import (
 )
 from sevivi.image_provider import AzureProvider
 from sevivi.image_provider.graph_provider import (
-    GraphImageProvider,
     CameraImuSyncedGraphProvider,
     JointSyncedGraphProvider,
     ManuallySyncedGraphProvider,
 )
+from sevivi.image_provider.graph_provider.graph_provider import GraphImageProvider
 from sevivi.image_provider.video_provider.video_provider import VideoImageProvider
 from sevivi.video_renderer.video_renderer import VideoRenderer
 
@@ -57,12 +57,13 @@ def instantiate_graph_providers(
         if isinstance(sc, ManuallySynchronizedSensorConfig):
             result[name] = ManuallySyncedGraphProvider(None)
         elif isinstance(sc, ImuSynchronizedSensorConfig):
-            result = CameraImuSyncedGraphProvider(
-                pd.read_csv(sc.path, index_col=0), sc.sensor_sync_column
+            result[name] = CameraImuSyncedGraphProvider(
+                pd.read_csv(sc.path, index_col=0, parse_dates=True),
+                sc.sensor_sync_column,
             )
         elif isinstance(sc, JointSynchronizedSensorConfig):
-            result = JointSyncedGraphProvider(
-                pd.read_csv(sc.path, index_col=0),
+            result[name] = JointSyncedGraphProvider(
+                pd.read_csv(sc.path, index_col=0, parse_dates=True),
                 sc.sync_joint_name,
                 sc.sensor_sync_axes,
                 sc.joint_sync_axis,
@@ -76,13 +77,13 @@ def instantiate_graph_providers(
 def instantiate_video_provider(video_config: VideoConfig) -> VideoImageProvider:
     """Instantiate the appropriate VideoImageProvider subclass for a given VideoConfig"""
     if isinstance(video_config, CameraImuVideoConfig):
-        raise RuntimeError("CameraImuVideoConfig Not Implemented")
+        raise NotImplementedError("CameraImuVideoConfig Not Implemented")
     elif isinstance(video_config, KinectVideoConfig):
         return AzureProvider(video_config.path, video_config.skeleton_path)
     elif isinstance(video_config, RawVideoConfig):
-        raise RuntimeError("RawVideoConfig Not Implemented")
+        raise NotImplementedError("RawVideoConfig Not Implemented")
     elif isinstance(video_config, OpenPoseVideoConfig):
-        raise RuntimeError("OpenPoseVideoConfig Not Implemented")
+        raise NotImplementedError("OpenPoseVideoConfig Not Implemented")
     else:
         raise RuntimeError(
             f"Unknown instance type of VideoConfig: {type(video_config)}"

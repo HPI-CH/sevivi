@@ -3,7 +3,7 @@ from typing import Union, List
 import pandas as pd
 
 from sevivi.config.config_types.sensor_config import SyncJointAxis
-from sevivi.image_provider import GraphImageProvider
+from .graph_provider import GraphImageProvider
 
 
 class JointSyncedGraphProvider(GraphImageProvider):

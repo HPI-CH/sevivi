@@ -1,4 +1,3 @@
-from .graph_provider import GraphImageProvider
 from .camera_imu_synced_graph_provider import CameraImuSyncedGraphProvider
 from .joint_synced_graph_provider import JointSyncedGraphProvider
 from .manually_synced_graph_provider import ManuallySyncedGraphProvider

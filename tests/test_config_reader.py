@@ -285,3 +285,26 @@ def test_missing_sensor_config(run_in_repo_root):
                 "test_files/configs/video_configs/kinect.toml",
             )
         )
+
+
+def test_default_target_file(run_in_repo_root):
+    cfg = config_reader.read_configs(
+        (
+            "test_files/configs/basic_config.toml",
+            "test_files/configs/video_configs/kinect.toml",
+            "test_files/configs/sensor_configs/camera_imu_synchronization.toml",
+        )
+    )
+    cfg.render_config.target_file_path = "sevivi.mp4"
+
+
+def test_modified_target_file(run_in_repo_root):
+    cfg = config_reader.read_configs(
+        (
+            "test_files/configs/basic_config.toml",
+            "test_files/configs/video_configs/kinect.toml",
+            "test_files/configs/sensor_configs/camera_imu_synchronization.toml",
+            "test_files/configs/change_target_file.toml",
+        )
+    )
+    cfg.render_config.target_file_path = "test.mp4"

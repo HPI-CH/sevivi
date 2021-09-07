@@ -2,7 +2,7 @@ from typing import List, Union
 
 import pandas as pd
 
-from sevivi.image_provider import GraphImageProvider
+from .graph_provider import GraphImageProvider
 
 
 class CameraImuSyncedGraphProvider(GraphImageProvider):

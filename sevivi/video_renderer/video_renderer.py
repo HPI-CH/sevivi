@@ -2,9 +2,7 @@ import logging
 from typing import Dict
 
 from sevivi.config import RenderConfig
-from sevivi.image_provider.graph_provider import (
-    GraphImageProvider,
-)
+from sevivi.image_provider.graph_provider.graph_provider import GraphImageProvider
 from sevivi.image_provider.video_provider.video_provider import VideoImageProvider
 
 logger = logging.getLogger("sevivi.video_renderer")
