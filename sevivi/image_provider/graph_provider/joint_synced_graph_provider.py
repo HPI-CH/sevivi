@@ -7,6 +7,11 @@ from .graph_provider import GraphImageProvider
 
 
 class JointSyncedGraphProvider(GraphImageProvider):
+    """
+    The joint synced graph provider knows to which joint of a skeleton it wants to be synchronized as well as
+    which of its columns can be used to do so.
+    """
+
     def __init__(
         self,
         data: pd.DataFrame,

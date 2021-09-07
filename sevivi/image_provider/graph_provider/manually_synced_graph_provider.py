@@ -4,6 +4,8 @@ from .graph_provider import GraphImageProvider
 
 
 class ManuallySyncedGraphProvider(GraphImageProvider):
+    """The manually synced graph provider relies on the supplied manual offset to be synchronous to the video."""
+
     def __init__(self, data: pd.DataFrame, manual_offset: pd.Timedelta):
         super().__init__(data)
         super().set_offset(manual_offset)
