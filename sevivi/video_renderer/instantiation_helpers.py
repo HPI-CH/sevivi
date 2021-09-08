@@ -4,7 +4,7 @@ from typing import Dict
 
 import pandas as pd
 
-from sevivi.config import Config
+from sevivi.config import Config, RenderConfig
 from sevivi.config.config_types.sensor_config import (
     ManuallySynchronizedSensorConfig,
     ImuSynchronizedSensorConfig,
@@ -19,12 +19,10 @@ from sevivi.config.config_types.video_config import (
     VideoConfig,
 )
 from sevivi.image_provider import AzureProvider
-from sevivi.image_provider.graph_provider import (
-    CameraImuSyncedGraphProvider,
-    JointSyncedGraphProvider,
-    ManuallySyncedGraphProvider,
-)
 from sevivi.image_provider.graph_provider.graph_provider import GraphImageProvider
+from sevivi.image_provider.video_provider.imu_camera_image_provider import (
+    ImuCameraImageProvider,
+)
 from sevivi.image_provider.video_provider.video_provider import VideoImageProvider
 from sevivi.video_renderer.video_renderer import VideoRenderer
 
@@ -38,15 +36,17 @@ def video_renderer_from_csv_files(config: Config) -> VideoRenderer:
         )
 
     video_provider = instantiate_video_provider(config.video_config)
-    graph_providers = instantiate_graph_providers(config.sensor_configs)
+    graph_providers = instantiate_graph_providers(
+        config.sensor_configs, config.render_config
+    )
     return VideoRenderer(config.render_config, video_provider, graph_providers)
 
 
 def instantiate_graph_providers(
-    sensor_configs: Dict[str, SensorConfig]
+    sensor_configs: Dict[str, SensorConfig], render_config: RenderConfig
 ) -> Dict[str, GraphImageProvider]:
     """
-    Instantiate a the appropriate GraphImageProvider subclass for a given config.
+    Instantiate a GraphImageProvider for each config.
 
     You must instantiate your GraphImageProviders manually if the data isn't stored as CSV or CSV.GZ where the
     first column is a DatetimeIndex
@@ -55,24 +55,7 @@ def instantiate_graph_providers(
 
     for name, sc in sensor_configs.items():
         data = pd.read_csv(sc.path, index_col=0, parse_dates=True)
-        if isinstance(sc, ManuallySynchronizedSensorConfig):
-            result[name] = ManuallySyncedGraphProvider(
-                data, pd.Timedelta(seconds=sc.offset_seconds)
-            )
-        elif isinstance(sc, ImuSynchronizedSensorConfig):
-            result[name] = CameraImuSyncedGraphProvider(
-                data,
-                sc.sensor_sync_column,
-            )
-        elif isinstance(sc, JointSynchronizedSensorConfig):
-            result[name] = JointSyncedGraphProvider(
-                data,
-                sc.sync_joint_name,
-                sc.sensor_sync_axes,
-                sc.joint_sync_axis,
-            )
-        else:
-            raise RuntimeError(f"Unknown instance type of SensorConfig: {type(sc)}")
+        result[name] = GraphImageProvider(data, render_config, sc)
 
     return result
 
@@ -80,7 +63,7 @@ def instantiate_graph_providers(
 def instantiate_video_provider(video_config: VideoConfig) -> VideoImageProvider:
     """Instantiate the appropriate VideoImageProvider subclass for a given VideoConfig"""
     if isinstance(video_config, CameraImuVideoConfig):
-        raise NotImplementedError("CameraImuVideoConfig Not Implemented")
+        return ImuCameraImageProvider(video_config.path, video_config.imu_path)
     elif isinstance(video_config, KinectVideoConfig):
         return AzureProvider(video_config.path, video_config.skeleton_path)
     elif isinstance(video_config, RawVideoConfig):

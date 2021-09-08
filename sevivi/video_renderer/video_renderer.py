@@ -2,8 +2,14 @@ import logging
 from typing import Dict
 
 from sevivi.config import RenderConfig
+from sevivi.config.config_types.sensor_config import (
+    JointSynchronizedSensorConfig,
+    ImuSynchronizedSensorConfig,
+    ManuallySynchronizedSensorConfig,
+)
 from sevivi.image_provider.graph_provider.graph_provider import GraphImageProvider
 from sevivi.image_provider.video_provider.video_provider import VideoImageProvider
+from sevivi.synchronizer.synchronizer import get_synchronization_offset
 
 logger = logging.getLogger("sevivi.video_renderer")
 
@@ -29,10 +35,22 @@ class VideoRenderer:
     def _prepare_graph_providers(self):
         """Prepare the graph providers so that their get_image_for_time_stamp can be used."""
         for name, gp in self.graph_providers.items():
-            sync_df = gp.get_sync_data_frame()
-            offset = self.video_provider.get_offset(sync_df)
-            logger.debug(f"Graph {name} gets offset {offset}")
-            gp.set_offset(offset)
+            sensor_conf = gp.sensor_config
+            if not isinstance(sensor_conf, ManuallySynchronizedSensorConfig):
+                if isinstance(sensor_conf, JointSynchronizedSensorConfig):
+                    video_sync_cols = sensor_conf.camera_joint_sync_column_selection
+                elif isinstance(sensor_conf, ImuSynchronizedSensorConfig):
+                    video_sync_cols = sensor_conf.camera_imu_sync_column_selection
+                else:
+                    raise RuntimeError(f"Unknown sensor cfg type: {type(sensor_conf)}")
+                video_sync_df = self.video_provider.get_sync_dataframe(video_sync_cols)
+
+                offset = get_synchronization_offset(
+                    video_sync_df, gp.get_sync_dataframe(), gp.sensor_config
+                )
+                # support sync dataframes with columns specified in sensors' config
+                logger.debug(f"Graph {name} gets offset {offset}")
+                gp.set_offset(offset)
 
     def render_video(self):
         """Renders the video from given VideoImageProvider and GraphImageProviders using the given RenderConfig."""

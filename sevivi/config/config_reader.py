@@ -118,13 +118,14 @@ def get_video_config(cfg: Dict) -> VideoConfig:
     try:
         cfg = cfg["video"][0]
         cfg_type = cfg["type"]
+        video_path = cfg["path"]
+        del cfg["path"]
+        del cfg["type"]
+
         if cfg_type == "imu":
-            result = CameraImuVideoConfig()
-            result.imu_path = cfg["imu_path"]
-            result.camera_imu_sync_column = cfg["camera_imu_sync_column"]
+            result = CameraImuVideoConfig(**cfg)
         elif cfg_type == "kinect":
-            result = KinectVideoConfig()
-            result.skeleton_path = cfg["skeleton_path"]
+            result = KinectVideoConfig(**cfg)
         elif cfg_type == "raw":
             result = RawVideoConfig()
         elif cfg_type == "openpose":
@@ -132,7 +133,7 @@ def get_video_config(cfg: Dict) -> VideoConfig:
         else:
             raise ValueError(f"Unknown video config type {cfg_type}")
 
-        result.path = cfg["path"]
+        result.path = video_path
     except KeyError as e:
         raise KeyError(f"Missing key '{e.args[0]}' in video config: {pformat(cfg)}")
     return result
@@ -145,17 +146,18 @@ def get_sensor_configs(config_dict: Dict) -> Dict[str, SensorConfig]:
         config_dict = config_dict["sensor"]
         for i, cfg in enumerate(config_dict):
             cfg_type = cfg["type"]
+            cleaned_cfg = cfg.copy()
+            del cleaned_cfg["path"]
+            del cleaned_cfg["type"]
+
             if cfg_type == "manually-synced":
-                result = ManuallySynchronizedSensorConfig()
-                result.offset_seconds = cfg.get("offset_seconds", result.offset_seconds)
+                result = ManuallySynchronizedSensorConfig(
+                    offset_seconds=cfg.get("offset_seconds", 0.0)
+                )
             elif cfg_type == "camera-imu-synced":
-                result = ImuSynchronizedSensorConfig()
-                result.sensor_sync_column = cfg["sensor_sync_column"]
+                result = ImuSynchronizedSensorConfig(**cleaned_cfg)
             elif cfg_type == "joint-synced":
-                result = JointSynchronizedSensorConfig()
-                result.sync_joint_name = cfg["sync_joint_name"]
-                result.sensor_sync_axes = cfg["sensor_sync_axes"]
-                result.joint_sync_axis = cfg["joint_sync_axis"]
+                result = JointSynchronizedSensorConfig(**cleaned_cfg)
             else:
                 raise ValueError(f"Unknown sensor config type {cfg_type}")
 
@@ -163,6 +165,8 @@ def get_sensor_configs(config_dict: Dict) -> Dict[str, SensorConfig]:
                 result.start_time = pd.to_datetime(cfg["start_time"])
             if "end_time" in cfg:
                 result.end_time = pd.to_datetime(cfg["end_time"])
+            if "graph_groups" in cfg:
+                result.end_time = cfg["graph_groups"]
 
             result.path = cfg["path"]
             result_dict[str(i)] = result

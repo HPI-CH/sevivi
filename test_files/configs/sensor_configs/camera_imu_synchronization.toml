@@ -1,4 +1,5 @@
 [[sensor]]
 type = "camera-imu-synced"
-sensor_sync_column = ["AccX", "Accel Y"]
+sensor_sync_column_selection = ["AccX", "Accel Y"]
+camera_imu_sync_column_selection = ["AccX", "Accel Y"]
 path = "test_files/sensor_imu.csv.gz"
