@@ -1,21 +1,9 @@
 from dataclasses import dataclass, field
 from typing import List, Dict
 
-from sevivi.config import PlottingMethod, VideoConfig
-from sevivi.config.config_types.sensor_config import SensorConfig
-from sevivi.config.config_types.stacking_direction import StackingDirection
-
-
-@dataclass
-class RenderConfig:
-    """Contains configuration relevant for rendering"""
-
-    stacking_direction: StackingDirection = StackingDirection.HORIZONTAL
-    plotting_method: PlottingMethod = PlottingMethod.MOVING_VERTICAL_LINE
-    parallel_image_ingestion: bool = False
-    add_magnitude: bool = False
-    draw_ticks: bool = False
-    target_file_path: str = "sevivi.mp4"
+from .video_config import VideoConfig
+from .render_config import RenderConfig
+from .sensor_config import SensorConfig
 
 
 @dataclass

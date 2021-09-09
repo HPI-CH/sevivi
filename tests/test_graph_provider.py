@@ -3,18 +3,16 @@ from datetime import datetime
 import pandas as pd
 import pytest
 
-from sevivi.config import RenderConfig
-from sevivi.config.config_types.sensor_config import (
+from sevivi.config import (
+    RenderConfig,
     SensorConfig,
     ImuSynchronizedSensorConfig,
     ManuallySynchronizedSensorConfig,
     JointSynchronizedSensorConfig,
-)
-from sevivi.image_provider.graph_provider.graph_provider import (
-    GraphImageProvider,
     find_matching_columns,
     get_graph_groups,
 )
+from sevivi.image_provider import GraphImageProvider
 
 
 def test_graph_count():

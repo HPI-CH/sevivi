@@ -1,10 +1,8 @@
-from abc import ABC
-from typing import Optional, List, Generator, Tuple
+from typing import List, Generator, Tuple
 
 import pandas as pd
 
-from sevivi.image_provider.graph_provider.graph_provider import GraphImageProvider
-from sevivi.image_provider.video_provider.video_provider import VideoImageProvider
+from .video_provider import VideoImageProvider
 
 
 class ImuCameraImageProvider(VideoImageProvider):

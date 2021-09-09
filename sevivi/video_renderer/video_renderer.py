@@ -1,14 +1,13 @@
 import logging
 from typing import Dict
 
-from sevivi.config import RenderConfig
-from sevivi.config.config_types.sensor_config import (
+from sevivi.config import (
+    RenderConfig,
     JointSynchronizedSensorConfig,
     ImuSynchronizedSensorConfig,
     ManuallySynchronizedSensorConfig,
 )
-from sevivi.image_provider.graph_provider.graph_provider import GraphImageProvider
-from sevivi.image_provider.video_provider.video_provider import VideoImageProvider
+from sevivi.image_provider import GraphImageProvider, VideoImageProvider
 from sevivi.synchronizer.synchronizer import get_synchronization_offset
 
 logger = logging.getLogger("sevivi.video_renderer")

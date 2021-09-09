@@ -7,19 +7,20 @@ from typing import Tuple, Dict
 import pandas as pd
 import toml
 
-from sevivi.config import PlottingMethod, Config, VideoConfig, RenderConfig
-from sevivi.config.config_types.sensor_config import (
+from sevivi.config import (
     SensorConfig,
     ManuallySynchronizedSensorConfig,
     JointSynchronizedSensorConfig,
     ImuSynchronizedSensorConfig,
-)
-from sevivi.config.config_types.stacking_direction import StackingDirection
-from sevivi.config.config_types.video_config import (
     CameraImuVideoConfig,
     KinectVideoConfig,
     RawVideoConfig,
     OpenPoseVideoConfig,
+    StackingDirection,
+    PlottingMethod,
+    Config,
+    VideoConfig,
+    RenderConfig,
 )
 
 logger = logging.getLogger("sevivi.config_reader")

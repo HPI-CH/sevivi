@@ -1,9 +1,6 @@
-from abc import ABC
 from typing import Optional, List, Generator, Tuple
 
 import pandas as pd
-
-from sevivi.image_provider.graph_provider.graph_provider import GraphImageProvider
 
 
 class VideoImageProvider:

@@ -1,6 +1,5 @@
 import os
 from dataclasses import dataclass
-from enum import Enum
 from typing import Optional, Union, List
 
 import pandas as pd

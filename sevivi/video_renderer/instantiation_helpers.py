@@ -4,27 +4,23 @@ from typing import Dict
 
 import pandas as pd
 
-from sevivi.config import Config, RenderConfig
-from sevivi.config.config_types.sensor_config import (
-    ManuallySynchronizedSensorConfig,
-    ImuSynchronizedSensorConfig,
-    JointSynchronizedSensorConfig,
-    SensorConfig,
-)
-from sevivi.config.config_types.video_config import (
+from sevivi.config import (
     CameraImuVideoConfig,
     KinectVideoConfig,
     RawVideoConfig,
     OpenPoseVideoConfig,
     VideoConfig,
+    Config,
+    RenderConfig,
+    SensorConfig,
 )
-from sevivi.image_provider import AzureProvider
-from sevivi.image_provider.graph_provider.graph_provider import GraphImageProvider
-from sevivi.image_provider.video_provider.imu_camera_image_provider import (
+from sevivi.image_provider import (
+    AzureProvider,
+    GraphImageProvider,
     ImuCameraImageProvider,
+    VideoImageProvider,
 )
-from sevivi.image_provider.video_provider.video_provider import VideoImageProvider
-from sevivi.video_renderer.video_renderer import VideoRenderer
+from .video_renderer import VideoRenderer
 
 
 def video_renderer_from_csv_files(config: Config) -> VideoRenderer:
