@@ -93,9 +93,7 @@ def test_render_graph_axes():
     )
     df = pd.DataFrame(data={"A": [1, 2, 3]}, index=dti)
     graph_image_provider = GraphImageProvider(df, RenderConfig(), SensorConfig())
-    with pytest.raises(NotImplementedError):
-        # noinspection PyTypeChecker
-        graph_image_provider.render_graph_axes(None)
+    graph_image_provider.render_graph_axes(None, None)
 
 
 def test_set_offset_positive():

@@ -3,7 +3,7 @@ from typing import Optional, List, Generator, Tuple
 import numpy as np
 import pandas as pd
 
-from sevivi.image_provider import Dimensions
+from ..dimensions import Dimensions
 
 
 class VideoImageProvider:
