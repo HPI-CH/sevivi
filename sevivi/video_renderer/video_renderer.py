@@ -1,16 +1,30 @@
 import logging
-from typing import Dict
+from collections import defaultdict
+from math import ceil
+from typing import Dict, Tuple
+
+import cv2
+import numpy as np
+import pandas as pd
+from matplotlib import pyplot as plt
+from matplotlib.axis import Axis
+from matplotlib.figure import Figure
 
 from sevivi.config import (
     RenderConfig,
     JointSynchronizedSensorConfig,
     ImuSynchronizedSensorConfig,
     ManuallySynchronizedSensorConfig,
+    StackingDirection,
+    PlottingMethod,
 )
-from sevivi.image_provider import GraphImageProvider, VideoImageProvider
+from sevivi.image_provider import GraphImageProvider, VideoImageProvider, Dimensions
 from sevivi.synchronizer.synchronizer import get_synchronization_offset
+from .progress_bar import progress_bar
 
 logger = logging.getLogger("sevivi.video_renderer")
+
+DPI = 100
 
 
 class VideoRenderer:
@@ -30,9 +44,43 @@ class VideoRenderer:
         self.graph_providers = graph_providers
 
         self._prepare_graph_providers()
+        self._graph_count = sum(
+            [gp.get_graph_count() for gp in self.graph_providers.values()]
+        )
+        (
+            self._plot_dims,
+            self.__tgt_vid_dims,
+            self.__src_vid_dims,
+        ) = self._prepare_dimensions()
+        self._fig, self._axs = self._prepare_figure()
+
+    def _prepare_dimensions(self) -> Tuple[Dimensions, Dimensions, Dimensions]:
+        src_vid_dim = self.video_provider.get_dimensions()
+        if self.render_config.stacking_direction == StackingDirection.VERTICAL:
+            plot_w, plot_h = src_vid_dim.w, 200 * self._graph_count
+            video_w, video_h = src_vid_dim.w, src_vid_dim.h + plot_h
+        else:
+            plot_w, plot_h = src_vid_dim.w, src_vid_dim.h
+            video_w, video_h = src_vid_dim.w // 2 + plot_w, src_vid_dim.h
+        return Dimensions(plot_w, plot_h), Dimensions(video_w, video_h), src_vid_dim
+
+    def _prepare_figure(self) -> Tuple[Figure, np.ndarray]:
+        graph_rows = ceil(self._graph_count / self.render_config.plot_column_count)
+        graph_cols = self.render_config.plot_column_count
+
+        figsize = self._plot_dims.w / DPI, self._plot_dims.h / DPI
+        fig, axs = plt.subplots(
+            graph_rows,
+            graph_cols,
+            figsize=figsize,
+            squeeze=False,
+            dpi=DPI,
+        )
+
+        return fig, axs
 
     def _prepare_graph_providers(self):
-        """Prepare the graph providers so that their get_image_for_time_stamp can be used."""
+        """Set offsets to graph providers"""
         for name, gp in self.graph_providers.items():
             sensor_conf = gp.sensor_config
             if not isinstance(sensor_conf, ManuallySynchronizedSensorConfig):
@@ -51,8 +99,51 @@ class VideoRenderer:
                 logger.debug(f"Graph {name} gets offset {offset}")
                 gp.set_offset(offset)
 
+    def stitch_plot_image(self, ts: pd.Timestamp) -> np.ndarray:
+        for gp in self.graph_providers.values():
+            gp.render_graph_axes(self._fig, ts)
+
+        return cv2.cvtColor(
+            np.asarray(self._fig.canvas.buffer_rgba()), cv2.COLOR_RGBA2BGR
+        )
+
     def render_video(self):
         """Renders the video from given VideoImageProvider and GraphImageProviders using the given RenderConfig."""
-        logger.error(
-            f"NOT IMPLEMENTED: rendering video to {self.render_config.target_file_path}"
+        src_vid_dim = self.__src_vid_dims
+        image = np.empty(
+            (self.__tgt_vid_dims.h, self.__tgt_vid_dims.w, 3), dtype=np.uint8
         )
+
+        writer = cv2.VideoWriter(
+            self.render_config.target_file_path,
+            cv2.VideoWriter_fourcc(*"DIVX"),
+            32,
+            tuple(self.__tgt_vid_dims),
+        )
+
+        video_provider = self.video_provider
+        images, image_count = video_provider.images(), video_provider.get_image_count()
+        for index, (ts, src_image) in progress_bar(images, image_count):
+            plot_image = self.stitch_plot_image(ts)
+
+            if self.render_config.stacking_direction == StackingDirection.VERTICAL:
+                # add the original video image
+                image[: src_vid_dim.h, :, :] = src_image
+                image[
+                    src_vid_dim.h : src_vid_dim.h + self._plot_dims.h, :, :
+                ] = plot_image
+            else:
+                # add the center half of the original video image
+                plot_center = self._plot_dims.w // 2
+                tgt_vid_left = slice(0, plot_center)
+                tgt_vid_center = slice(plot_center, plot_center + src_vid_dim.w // 2)
+                tgt_vid_right = slice(stop=src_vid_dim.w // 2 + plot_center)
+
+                source_video_half = slice(src_vid_dim.w // 4, 3 * src_vid_dim.w // 4)
+
+                image[:, tgt_vid_left, :] = plot_image[:, tgt_vid_left, :]
+                image[:, tgt_vid_center, :] = src_image[:, source_video_half, :]
+                image[:, tgt_vid_right, :] = plot_image[:, self._plot_dims.w // 2 :, :]
+
+            writer.write(image)
+        writer.release()

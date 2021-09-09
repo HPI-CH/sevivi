@@ -14,3 +14,5 @@ class RenderConfig:
     add_magnitude: bool = False
     draw_ticks: bool = False
     target_file_path: str = "sevivi.mp4"
+    plot_column_count = 2
+    """Number of columns to use in the plots. Should be divisible by 2 for StackingDirection.HORIZONTAL"""

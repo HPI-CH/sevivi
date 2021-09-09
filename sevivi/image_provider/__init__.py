@@ -5,3 +5,4 @@ from .video_provider import (
     VideoImageProvider,
 )
 from .graph_provider import GraphImageProvider
+from .dimensions import Dimensions
