@@ -95,7 +95,6 @@ def test_read_imu_video_config(run_in_repo_root):
     assert imu_conf.path == "test_files/kinect.mkv"
     assert isinstance(imu_conf, CameraImuVideoConfig)
     assert imu_conf.imu_path == "test_files/kinect_imu.csv.gz"
-    assert imu_conf.camera_imu_sync_column == ["AX", "Accel Y"]
 
 
 def test_read_kinect_video_config(run_in_repo_root):
@@ -143,9 +142,8 @@ def test_joint_sync_imu(run_in_repo_root):
     assert len(conf) == 1
     conf = conf["0"]
     assert isinstance(conf, JointSynchronizedSensorConfig)
-    assert conf.sync_joint_name == "ANKLE"
-    assert conf.sensor_sync_axes == ["AccX", "Accel Y", "ACC Z"]
-    assert conf.joint_sync_axis == "ACCELERATION_MAG"
+    assert conf.sensor_sync_column_selection == ["AccX", "Accel Y", "ACC Z"]
+    assert conf.camera_joint_sync_column_selection == ["AccX", "Accel Y", "ACC Z"]
 
 
 def test_camera_sync_imu(run_in_repo_root):
@@ -153,8 +151,8 @@ def test_camera_sync_imu(run_in_repo_root):
     assert len(conf) == 1
     conf = conf["0"]
     assert isinstance(conf, ImuSynchronizedSensorConfig)
-    assert conf.sensor_sync_column == ["AccX", "Accel Y"]
-    assert conf.path == "test_files/camera_imu.csv.gz"
+    assert conf.sensor_sync_column_selection == ["AccX", "Accel Y"]
+    assert conf.path == "test_files/sensor_imu.csv.gz"
 
 
 def test_camera_sync_imu_single_col(run_in_repo_root):
@@ -162,7 +160,7 @@ def test_camera_sync_imu_single_col(run_in_repo_root):
     assert len(conf) == 1
     conf = conf["0"]
     assert isinstance(conf, ImuSynchronizedSensorConfig)
-    assert conf.sensor_sync_column == "AccX"
+    assert conf.sensor_sync_column_selection == "AccX"
     assert conf.path == "test_files/camera_imu.csv.gz"
 
 
@@ -285,3 +283,26 @@ def test_missing_sensor_config(run_in_repo_root):
                 "test_files/configs/video_configs/kinect.toml",
             )
         )
+
+
+def test_default_target_file(run_in_repo_root):
+    cfg = config_reader.read_configs(
+        (
+            "test_files/configs/basic_config.toml",
+            "test_files/configs/video_configs/kinect.toml",
+            "test_files/configs/sensor_configs/camera_imu_synchronization.toml",
+        )
+    )
+    cfg.render_config.target_file_path = "sevivi.mp4"
+
+
+def test_modified_target_file(run_in_repo_root):
+    cfg = config_reader.read_configs(
+        (
+            "test_files/configs/basic_config.toml",
+            "test_files/configs/video_configs/kinect.toml",
+            "test_files/configs/sensor_configs/camera_imu_synchronization.toml",
+            "test_files/configs/change_target_file.toml",
+        )
+    )
+    cfg.render_config.target_file_path = "test.mp4"

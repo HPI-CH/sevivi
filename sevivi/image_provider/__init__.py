@@ -1,2 +1,7 @@
-from .image_provider import ImageProvider
-from sevivi.image_provider.video_provider import AzureProvider
+from .video_provider import (
+    AzureProvider,
+    PlainVideoImageProvider,
+    ImuCameraImageProvider,
+    VideoImageProvider,
+)
+from .graph_provider import GraphImageProvider

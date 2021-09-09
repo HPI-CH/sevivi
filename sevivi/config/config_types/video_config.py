@@ -1,6 +1,6 @@
 import os
 from dataclasses import dataclass
-from typing import Union, List
+from typing import List
 
 
 @dataclass
@@ -45,13 +45,6 @@ class CameraImuVideoConfig(VideoConfig):
 
     imu_path: str = None
     """Path to the IMU data corresponding to the camera"""
-
-    camera_imu_sync_column: Union[str, List[str]] = None
-    """
-    Name of the columns or list of the columns that contain the IMU data to synchronize with.
-    If a list given, the magnitude of the listed columns will be used.
-    All of the sensors will be synchronized to these columns.
-    """
 
     def get_missing_files(self) -> List[str]:
         """Returns true if all files for this config exist"""

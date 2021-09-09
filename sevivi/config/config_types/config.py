@@ -1,22 +1,18 @@
 from dataclasses import dataclass, field
 from typing import List, Dict
 
-from sevivi.config import PlottingMethod, VideoConfig
-from sevivi.config.config_types.sensor_config import SensorConfig
-from sevivi.config.config_types.stacking_direction import StackingDirection
+from .video_config import VideoConfig
+from .render_config import RenderConfig
+from .sensor_config import SensorConfig
 
 
 @dataclass
 class Config:
-    """Typed configuration for the entire tool."""
+    """Typed configuration for the CLI. Contains render configuration as well as video and sensor config."""
 
     video_config: VideoConfig = None
     sensor_configs: Dict[str, SensorConfig] = field(default_factory=dict)
-    stacking_direction: StackingDirection = StackingDirection.HORIZONTAL
-    plotting_method: PlottingMethod = PlottingMethod.MOVING_VERTICAL_LINE
-    parallel_image_ingestion: bool = False
-    add_magnitude: bool = False
-    draw_ticks: bool = False
+    render_config: RenderConfig = None
 
     def get_missing_files(self) -> List[str]:
         """

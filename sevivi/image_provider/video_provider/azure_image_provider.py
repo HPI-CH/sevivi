@@ -1,3 +1,5 @@
+from typing import List, Optional, Generator, Tuple
+
 import pandas as pd
 import os
 import cv2
@@ -17,10 +19,11 @@ class AzureProvider(VideoImageProvider):
         print(subjects)
         print(df)
 
-        super().__init__(df)
-
         length = int(self.__video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
         print(length)
 
-    def get_image_for_time_stamp(self):
+    def images(self) -> Generator[Tuple[pd.Timestamp, bytes], None, None]:
+        pass
+
+    def get_sync_dataframe(self, column_names: List[str]) -> Optional[pd.DataFrame]:
         pass

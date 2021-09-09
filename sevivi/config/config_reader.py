@@ -7,19 +7,20 @@ from typing import Tuple, Dict
 import pandas as pd
 import toml
 
-from sevivi.config import PlottingMethod, Config, VideoConfig
-from sevivi.config.config_types.sensor_config import (
+from sevivi.config import (
     SensorConfig,
     ManuallySynchronizedSensorConfig,
     JointSynchronizedSensorConfig,
     ImuSynchronizedSensorConfig,
-)
-from sevivi.config.config_types.stacking_direction import StackingDirection
-from sevivi.config.config_types.video_config import (
     CameraImuVideoConfig,
     KinectVideoConfig,
     RawVideoConfig,
     OpenPoseVideoConfig,
+    StackingDirection,
+    PlottingMethod,
+    Config,
+    VideoConfig,
+    RenderConfig,
 )
 
 logger = logging.getLogger("sevivi.config_reader")
@@ -53,21 +54,26 @@ def read_configs(config_file_paths: Tuple[str, ...]) -> Config:
         )
 
     config_dict = merge_config_files(config_file_paths)
-    config = Config()
+    render_config = RenderConfig()
 
+    if "target_file_path" in config_dict:
+        render_config.target_file_path = config_dict["target_file_path"]
     if "draw_ticks" in config_dict:
-        config.draw_ticks = get_bool(config_dict, "draw_ticks")
+        render_config.draw_ticks = get_bool(config_dict, "draw_ticks")
     if "add_magnitude" in config_dict:
-        config.add_magnitude = get_bool(config_dict, "add_magnitude")
+        render_config.add_magnitude = get_bool(config_dict, "add_magnitude")
     if "use_parallel_image_ingestion" in config_dict:
-        config.use_parallel_image_ingestion = get_bool(
+        render_config.use_parallel_image_ingestion = get_bool(
             config_dict, "use_parallel_image_ingestion"
         )
 
     if "plotting_method" in config_dict:
-        config.plotting_method = get_plotting_method(config_dict)
+        render_config.plotting_method = get_plotting_method(config_dict)
     if "stacking_direction" in config_dict:
-        config.stacking_direction = get_stacking_direction(config_dict)
+        render_config.stacking_direction = get_stacking_direction(config_dict)
+
+    config = Config()
+    config.render_config = render_config
 
     if "video" in config_dict:
         config.video_config = get_video_config(config_dict)
@@ -113,13 +119,14 @@ def get_video_config(cfg: Dict) -> VideoConfig:
     try:
         cfg = cfg["video"][0]
         cfg_type = cfg["type"]
+        video_path = cfg["path"]
+        del cfg["path"]
+        del cfg["type"]
+
         if cfg_type == "imu":
-            result = CameraImuVideoConfig()
-            result.imu_path = cfg["imu_path"]
-            result.camera_imu_sync_column = cfg["camera_imu_sync_column"]
+            result = CameraImuVideoConfig(**cfg)
         elif cfg_type == "kinect":
-            result = KinectVideoConfig()
-            result.skeleton_path = cfg["skeleton_path"]
+            result = KinectVideoConfig(**cfg)
         elif cfg_type == "raw":
             result = RawVideoConfig()
         elif cfg_type == "openpose":
@@ -127,7 +134,7 @@ def get_video_config(cfg: Dict) -> VideoConfig:
         else:
             raise ValueError(f"Unknown video config type {cfg_type}")
 
-        result.path = cfg["path"]
+        result.path = video_path
     except KeyError as e:
         raise KeyError(f"Missing key '{e.args[0]}' in video config: {pformat(cfg)}")
     return result
@@ -140,17 +147,18 @@ def get_sensor_configs(config_dict: Dict) -> Dict[str, SensorConfig]:
         config_dict = config_dict["sensor"]
         for i, cfg in enumerate(config_dict):
             cfg_type = cfg["type"]
+            cleaned_cfg = cfg.copy()
+            del cleaned_cfg["path"]
+            del cleaned_cfg["type"]
+
             if cfg_type == "manually-synced":
-                result = ManuallySynchronizedSensorConfig()
-                result.offset_seconds = cfg.get("offset_seconds", result.offset_seconds)
+                result = ManuallySynchronizedSensorConfig(
+                    offset_seconds=cfg.get("offset_seconds", 0.0)
+                )
             elif cfg_type == "camera-imu-synced":
-                result = ImuSynchronizedSensorConfig()
-                result.sensor_sync_column = cfg["sensor_sync_column"]
+                result = ImuSynchronizedSensorConfig(**cleaned_cfg)
             elif cfg_type == "joint-synced":
-                result = JointSynchronizedSensorConfig()
-                result.sync_joint_name = cfg["sync_joint_name"]
-                result.sensor_sync_axes = cfg["sensor_sync_axes"]
-                result.joint_sync_axis = cfg["joint_sync_axis"]
+                result = JointSynchronizedSensorConfig(**cleaned_cfg)
             else:
                 raise ValueError(f"Unknown sensor config type {cfg_type}")
 
@@ -158,6 +166,8 @@ def get_sensor_configs(config_dict: Dict) -> Dict[str, SensorConfig]:
                 result.start_time = pd.to_datetime(cfg["start_time"])
             if "end_time" in cfg:
                 result.end_time = pd.to_datetime(cfg["end_time"])
+            if "graph_groups" in cfg:
+                result.end_time = cfg["graph_groups"]
 
             result.path = cfg["path"]
             result_dict[str(i)] = result

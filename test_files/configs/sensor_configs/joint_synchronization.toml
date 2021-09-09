@@ -1,6 +1,7 @@
 [[sensor]]
 type = "joint-synced"
-sync_joint_name = "ANKLE"
-sensor_sync_axes = ["AccX", "Accel Y", "ACC Z"]
-joint_sync_axis = "ACCELERATION_MAG"
+# this is the sensor df column names; multiple -> magnitude; single -> glob pattern
+sensor_sync_column_selection = ["AccX", "Accel Y", "ACC Z"]
+# this is the camera column names; multiple -> magnitude; single -> glob pattern
+camera_joint_sync_column_selection = ["AccX", "Accel Y", "ACC Z"]
 path = "test_files/joint_imu.csv.gz"
