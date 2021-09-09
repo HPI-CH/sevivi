@@ -22,9 +22,6 @@ class AzureProvider(VideoImageProvider):
         length = int(self.__video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
         print(length)
 
-    def get_image_for_time_stamp(self, ts: pd.Timestamp):
-        pass
-
     def images(self) -> Generator[Tuple[pd.Timestamp, bytes], None, None]:
         pass
 
