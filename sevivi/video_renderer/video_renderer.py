@@ -110,6 +110,7 @@ class VideoRenderer:
         offset = get_synchronization_offset(video_sync_df, graph_sync_df, config)
 
         logger.debug(f"Graph {graph_provider.sensor_config.name} gets offset {offset}")
+        return offset
 
     def stitch_plot_image(self, ts: pd.Timestamp) -> np.ndarray:
         # self.graph_providers["1"].render_graph_axes(self._fig, ts)

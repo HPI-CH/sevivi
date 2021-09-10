@@ -13,7 +13,7 @@ from sevivi.config.config_types.video_config import (
     RawVideoConfig,
     OpenPoseVideoConfig,
 )
-from sevivi.image_provider import AzureProvider
+from sevivi.image_provider import AzureProvider, PlainVideoImageProvider
 from sevivi.image_provider.video_provider.imu_camera_image_provider import (
     ImuCameraImageProvider,
 )
@@ -50,8 +50,9 @@ def test_instantiate_kinect_video_provider(run_in_repo_root):
 
 
 def test_instantiate_raw_video_provider():
-    with pytest.raises(NotImplementedError):
-        instantiate_video_provider(RawVideoConfig())
+    assert isinstance(
+        instantiate_video_provider(RawVideoConfig()), PlainVideoImageProvider
+    )
 
 
 def test_instantiate_openpose_video_provider():

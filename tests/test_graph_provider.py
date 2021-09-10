@@ -97,41 +97,29 @@ def test_render_graph_axes():
 
 
 def test_set_offset_positive():
-    dti = pd.to_datetime(
-        [datetime(2018, 1, 3), datetime(2018, 1, 2), datetime(2018, 1, 1)]
-    )
-    df = pd.DataFrame(data={"A": [1, 2, 3]}, index=dti)
+    dti = pd.to_datetime([datetime(2018, 1, 2), datetime(2018, 1, 3)])
+    df = pd.DataFrame(data={"A": [1, 3]}, index=dti)
     graph_image_provider = GraphImageProvider(
         df, RenderConfig(), ManuallySynchronizedSensorConfig()
     )
     graph_image_provider.set_offset(pd.Timedelta(days=1))
     new_index = graph_image_provider._data.index
+    expected = pd.to_datetime([datetime(1970, 1, 1), datetime(1970, 1, 2)])
     # noinspection PyUnresolvedReferences
-    assert (
-        new_index
-        == pd.to_datetime(
-            [datetime(2018, 1, 4), datetime(2018, 1, 3), datetime(2018, 1, 2)]
-        )
-    ).all()
+    assert (new_index == expected).all()
 
 
 def test_set_offset_negative():
-    dti = pd.to_datetime(
-        [datetime(2018, 1, 3), datetime(2018, 1, 2), datetime(2018, 1, 4)]
-    )
-    df = pd.DataFrame(data={"A": [1, 2, 3]}, index=dti)
+    dti = pd.to_datetime([datetime(2018, 1, 2), datetime(2018, 1, 3)])
+    df = pd.DataFrame(data={"A": [1, 3]}, index=dti)
     graph_image_provider = GraphImageProvider(
         df, RenderConfig(), ManuallySynchronizedSensorConfig()
     )
     graph_image_provider.set_offset(pd.Timedelta(days=-1))
     new_index = graph_image_provider._data.index
+    expected = pd.to_datetime([datetime(1970, 1, 1), datetime(1970, 1, 2)])
     # noinspection PyUnresolvedReferences
-    assert (
-        new_index
-        == pd.to_datetime(
-            [datetime(2018, 1, 2), datetime(2018, 1, 1), datetime(2018, 1, 3)]
-        )
-    ).all()
+    assert (new_index == expected).all()
 
 
 def test_get_sync_data_frame_bad_index():
