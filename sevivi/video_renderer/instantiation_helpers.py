@@ -19,6 +19,7 @@ from sevivi.image_provider import (
     GraphImageProvider,
     ImuCameraImageProvider,
     VideoImageProvider,
+    PlainVideoImageProvider,
 )
 from .video_renderer import VideoRenderer
 
@@ -63,7 +64,7 @@ def instantiate_video_provider(video_config: VideoConfig) -> VideoImageProvider:
     elif isinstance(video_config, KinectVideoConfig):
         return AzureProvider(video_config.path, video_config.skeleton_path)
     elif isinstance(video_config, RawVideoConfig):
-        raise NotImplementedError("RawVideoConfig Not Implemented")
+        return PlainVideoImageProvider(video_config.path)
     elif isinstance(video_config, OpenPoseVideoConfig):
         raise NotImplementedError("OpenPoseVideoConfig Not Implemented")
     else:

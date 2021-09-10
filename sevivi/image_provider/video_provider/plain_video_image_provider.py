@@ -27,7 +27,7 @@ class PlainVideoImageProvider(VideoImageProvider):
             frame_exists, frame = self.__video.read()
             if frame_exists:
                 ts = self.__video.get(cv2.CAP_PROP_POS_MSEC)
-                yield pd.Timestamp(microsecond=ts * 1000), frame
+                yield pd.to_datetime(ts, unit="ms"), frame
             else:
                 break
 

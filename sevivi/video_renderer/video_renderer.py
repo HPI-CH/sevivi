@@ -43,26 +43,23 @@ class VideoRenderer:
         self.video_provider = video_provider
         self.graph_providers = graph_providers
 
-        self._prepare_graph_providers()
         self._graph_count = sum(
             [gp.get_graph_count() for gp in self.graph_providers.values()]
         )
-        (
-            self._plot_dims,
-            self.__tgt_vid_dims,
-            self.__src_vid_dims,
-        ) = self._prepare_dimensions()
+        self.__src_vid_dims = self.video_provider.get_dimensions()
+        self._plot_dims, self.__tgt_vid_dims = self._prepare_dimensions()
         self._fig, self._axs = self._prepare_figure()
+        self._prepare_graph_providers()
 
-    def _prepare_dimensions(self) -> Tuple[Dimensions, Dimensions, Dimensions]:
-        src_vid_dim = self.video_provider.get_dimensions()
+    def _prepare_dimensions(self) -> Tuple[Dimensions, Dimensions]:
+        src_vid_dim = self.__src_vid_dims
         if self.render_config.stacking_direction == StackingDirection.VERTICAL:
             plot_w, plot_h = src_vid_dim.w, 200 * self._graph_count
             video_w, video_h = src_vid_dim.w, src_vid_dim.h + plot_h
         else:
             plot_w, plot_h = src_vid_dim.w, src_vid_dim.h
             video_w, video_h = src_vid_dim.w // 2 + plot_w, src_vid_dim.h
-        return Dimensions(plot_w, plot_h), Dimensions(video_w, video_h), src_vid_dim
+        return Dimensions(plot_w, plot_h), Dimensions(video_w, video_h)
 
     def _prepare_figure(self) -> Tuple[Figure, np.ndarray]:
         graph_rows = ceil(self._graph_count / self.render_config.plot_column_count)
@@ -77,10 +74,11 @@ class VideoRenderer:
             dpi=DPI,
         )
 
-        return fig, axs
+        return fig, axs.flatten()
 
     def _prepare_graph_providers(self):
         """Set offsets to graph providers"""
+        assigned_axis_count = 0
         for name, gp in self.graph_providers.items():
             sensor_conf = gp.sensor_config
             if not isinstance(sensor_conf, ManuallySynchronizedSensorConfig):
@@ -98,6 +96,9 @@ class VideoRenderer:
                 # support sync dataframes with columns specified in sensors' config
                 logger.debug(f"Graph {name} gets offset {offset}")
                 gp.set_offset(offset)
+            axis_limit = assigned_axis_count + gp.get_graph_count()
+            gp.set_axs(self._fig, self._axs[assigned_axis_count:axis_limit])
+            assigned_axis_count += gp.get_graph_count()
 
     def stitch_plot_image(self, ts: pd.Timestamp) -> np.ndarray:
         for gp in self.graph_providers.values():
@@ -129,21 +130,20 @@ class VideoRenderer:
             if self.render_config.stacking_direction == StackingDirection.VERTICAL:
                 # add the original video image
                 image[: src_vid_dim.h, :, :] = src_image
-                image[
-                    src_vid_dim.h : src_vid_dim.h + self._plot_dims.h, :, :
-                ] = plot_image
+                below_src_vid = slice(src_vid_dim.h, src_vid_dim.h + self._plot_dims.h)
+                image[below_src_vid, :, :] = plot_image
             else:
                 # add the center half of the original video image
                 plot_center = self._plot_dims.w // 2
                 tgt_vid_left = slice(0, plot_center)
                 tgt_vid_center = slice(plot_center, plot_center + src_vid_dim.w // 2)
-                tgt_vid_right = slice(stop=src_vid_dim.w // 2 + plot_center)
+                tgt_vid_right = slice(src_vid_dim.w // 2 + plot_center, None, None)
 
                 source_video_half = slice(src_vid_dim.w // 4, 3 * src_vid_dim.w // 4)
 
                 image[:, tgt_vid_left, :] = plot_image[:, tgt_vid_left, :]
                 image[:, tgt_vid_center, :] = src_image[:, source_video_half, :]
-                image[:, tgt_vid_right, :] = plot_image[:, self._plot_dims.w // 2 :, :]
+                image[:, tgt_vid_right, :] = plot_image[:, plot_center:, :]
 
             writer.write(image)
         writer.release()

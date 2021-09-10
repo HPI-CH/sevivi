@@ -24,7 +24,7 @@ def calculate_index(
     """
     Return the first index value after the target timestamp if the exact timestamp is not available
     """
-    if target_ts > timestamps:
+    if (target_ts > timestamps).all():
         return timestamps[-1]
     elif target_ts in timestamps:
         return target_ts
@@ -63,11 +63,11 @@ class GraphImageProvider:
         for axis_idx, (name, cols) in enumerate(self._graph_groups.items()):
             self.__axs[axis_idx] = (axes[axis_idx], cols, name)
 
-        for axis_idx, (axis, cols, title) in self.__axs:
+        for axis_idx, (axis, cols, title) in self.__axs.items():
             axis.set_ylim(self.get_ylimits(axis_idx))
             axis.set_title(title)
             axis.set_xlim(self.get_xlimits())
-            axis.set_xticks(self.get_xtick_locations(axis_idx))
+            # axis.set_xticks(self.get_xtick_locations(axis_idx))
 
             for col_idx, col in enumerate(cols):
                 self.__lines[axis_idx][col] = axis.plot(
@@ -80,7 +80,7 @@ class GraphImageProvider:
         # draw once to cache renderers
         figure.canvas.draw()
 
-        for axis_idx, (axis, cols, title) in self.__axs:
+        for axis_idx, (axis, cols, title) in self.__axs.items():
             for col_idx, line in self.__lines[axis_idx].items():
                 self.__bboxes[axis_idx][col_idx] = figure.canvas.copy_from_bbox(
                     line.clipbox
@@ -111,7 +111,7 @@ class GraphImageProvider:
         return self.__axs[axis][2]
 
     def get_xlimits(self):
-        pass
+        return self._data.index[0], self._data.index[-1]
 
     def get_xtick_locations(self, axis: int):
         pass
@@ -126,7 +126,7 @@ class GraphImageProvider:
             raise NotImplementedError("Only VLINE implemented so far")
 
     def _render_vline(self, figure: Figure, ts: pd.Timestamp):
-        for axis_idx, (axis, cols, title) in self.__axs:
+        for axis_idx, (axis, cols, title) in self.__axs.items():
 
             for col in cols:
                 figure.canvas.restore_region(self.__bboxes[axis_idx][col])
