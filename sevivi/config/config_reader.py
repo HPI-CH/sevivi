@@ -22,8 +22,9 @@ from sevivi.config import (
     VideoConfig,
     RenderConfig,
 )
+from sevivi.log import logger
 
-logger = logging.getLogger("sevivi.config_reader")
+logger = logger.getChild("config_reader")
 
 
 def merge_config_files(config_file_paths: Tuple[str, ...]) -> Dict:
@@ -58,6 +59,8 @@ def read_configs(config_file_paths: Tuple[str, ...]) -> Config:
 
     if "target_file_path" in config_dict:
         render_config.target_file_path = config_dict["target_file_path"]
+    if "fourcc_codec" in config_dict:
+        render_config.fourcc_codec = config_dict["fourcc_codec"]
     if "draw_ticks" in config_dict:
         render_config.draw_ticks = get_bool(config_dict, "draw_ticks")
     if "add_magnitude" in config_dict:
@@ -167,8 +170,10 @@ def get_sensor_configs(config_dict: Dict) -> Dict[str, SensorConfig]:
             if "end_time" in cfg:
                 result.end_time = pd.to_datetime(cfg["end_time"])
             if "graph_groups" in cfg:
-                result.end_time = cfg["graph_groups"]
+                result.graph_groups = cfg["graph_groups"]
 
+            if "name" in cfg:
+                result.name = cfg["name"]
             result.path = cfg["path"]
             result_dict[str(i)] = result
     except KeyError as e:

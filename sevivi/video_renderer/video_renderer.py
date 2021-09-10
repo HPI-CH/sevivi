@@ -1,7 +1,7 @@
 import logging
 from collections import defaultdict
 from math import ceil
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Optional, List
 
 import cv2
 import numpy as np
@@ -17,12 +17,15 @@ from sevivi.config import (
     ManuallySynchronizedSensorConfig,
     StackingDirection,
     PlottingMethod,
+    SensorConfig,
 )
 from sevivi.image_provider import GraphImageProvider, VideoImageProvider, Dimensions
 from sevivi.synchronizer.synchronizer import get_synchronization_offset
 from .progress_bar import progress_bar
 
-logger = logging.getLogger("sevivi.video_renderer")
+from sevivi.log import logger
+
+logger = logger.getChild("video_renderer")
 
 DPI = 100
 
@@ -37,15 +40,13 @@ class VideoRenderer:
         self,
         render_config: RenderConfig,
         video_provider: VideoImageProvider,
-        graph_providers: Dict[str, GraphImageProvider],
+        graph_providers: List[GraphImageProvider],
     ):
         self.render_config = render_config
         self.video_provider = video_provider
         self.graph_providers = graph_providers
 
-        self._graph_count = sum(
-            [gp.get_graph_count() for gp in self.graph_providers.values()]
-        )
+        self._graph_count = sum([gp.get_graph_count() for gp in self.graph_providers])
         self.__src_vid_dims = self.video_provider.get_dimensions()
         self._plot_dims, self.__tgt_vid_dims = self._prepare_dimensions()
         self._fig, self._axs = self._prepare_figure()
@@ -73,40 +74,50 @@ class VideoRenderer:
             squeeze=False,
             dpi=DPI,
         )
+        plt.tight_layout()
 
-        return fig, axs.flatten()
+        return fig, axs.ravel()
 
     def _prepare_graph_providers(self):
         """Set offsets to graph providers"""
         assigned_axis_count = 0
-        for name, gp in self.graph_providers.items():
-            sensor_conf = gp.sensor_config
-            if not isinstance(sensor_conf, ManuallySynchronizedSensorConfig):
-                if isinstance(sensor_conf, JointSynchronizedSensorConfig):
-                    video_sync_cols = sensor_conf.camera_joint_sync_column_selection
-                elif isinstance(sensor_conf, ImuSynchronizedSensorConfig):
-                    video_sync_cols = sensor_conf.camera_imu_sync_column_selection
-                else:
-                    raise RuntimeError(f"Unknown sensor cfg type: {type(sensor_conf)}")
-                video_sync_df = self.video_provider.get_sync_dataframe(video_sync_cols)
+        for gp in self.graph_providers:
+            gp.set_offset(self._calc_offset(gp))
 
-                offset = get_synchronization_offset(
-                    video_sync_df, gp.get_sync_dataframe(), gp.sensor_config
-                )
-                # support sync dataframes with columns specified in sensors' config
-                logger.debug(f"Graph {name} gets offset {offset}")
-                gp.set_offset(offset)
-            axis_limit = assigned_axis_count + gp.get_graph_count()
-            gp.set_axs(self._fig, self._axs[assigned_axis_count:axis_limit])
+            axis_idx_limit = assigned_axis_count + gp.get_graph_count()
+            gp.set_axs(self._fig, self._axs[assigned_axis_count:axis_idx_limit])
+            logger.debug(
+                f"Assigned axis {assigned_axis_count}:{axis_idx_limit} to GP {gp.sensor_config.name}"
+            )
             assigned_axis_count += gp.get_graph_count()
 
+    def _calc_offset(
+        self, graph_provider: GraphImageProvider
+    ) -> Optional[pd.Timedelta]:
+        config = graph_provider.sensor_config
+
+        if isinstance(config, ManuallySynchronizedSensorConfig):
+            return None
+        elif isinstance(config, JointSynchronizedSensorConfig):
+            video_sync_cols = config.camera_joint_sync_column_selection
+        elif isinstance(config, ImuSynchronizedSensorConfig):
+            video_sync_cols = config.camera_imu_sync_column_selection
+        else:
+            raise RuntimeError(f"Unknown sensor cfg type: {type(config)}")
+
+        video_sync_df = self.video_provider.get_sync_dataframe(video_sync_cols)
+        graph_sync_df = graph_provider.get_sync_dataframe()
+        offset = get_synchronization_offset(video_sync_df, graph_sync_df, config)
+
+        logger.debug(f"Graph {graph_provider.sensor_config.name} gets offset {offset}")
+
     def stitch_plot_image(self, ts: pd.Timestamp) -> np.ndarray:
-        for gp in self.graph_providers.values():
+        # self.graph_providers["1"].render_graph_axes(self._fig, ts)
+        for gp in self.graph_providers:
             gp.render_graph_axes(self._fig, ts)
 
-        return cv2.cvtColor(
-            np.asarray(self._fig.canvas.buffer_rgba()), cv2.COLOR_RGBA2BGR
-        )
+        canvas_buffer = self._fig.canvas.buffer_rgba()
+        return cv2.cvtColor(np.asarray(canvas_buffer), cv2.COLOR_RGBA2BGR)
 
     def render_video(self):
         """Renders the video from given VideoImageProvider and GraphImageProviders using the given RenderConfig."""
@@ -117,7 +128,7 @@ class VideoRenderer:
 
         writer = cv2.VideoWriter(
             self.render_config.target_file_path,
-            cv2.VideoWriter_fourcc(*"DIVX"),
+            cv2.VideoWriter_fourcc(*self.render_config.fourcc_codec),
             32,
             tuple(self.__tgt_vid_dims),
         )

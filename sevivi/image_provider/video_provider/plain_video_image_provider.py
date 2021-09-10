@@ -7,7 +7,9 @@ import cv2
 from .video_provider import VideoImageProvider
 from ..dimensions import Dimensions
 
-logger = logging.getLogger("sevivi.plain_video_image_provider")
+from sevivi.log import logger
+
+logger = logger.getChild("plain_video_image_provider")
 
 
 class PlainVideoImageProvider(VideoImageProvider):

@@ -1,6 +1,6 @@
 """Contains helpers to instantiate Video- and GraphImageProviders for the CLI"""
 
-from typing import Dict
+from typing import Dict, List
 
 import pandas as pd
 
@@ -41,18 +41,18 @@ def video_renderer_from_csv_files(config: Config) -> VideoRenderer:
 
 def instantiate_graph_providers(
     sensor_configs: Dict[str, SensorConfig], render_config: RenderConfig
-) -> Dict[str, GraphImageProvider]:
+) -> List[GraphImageProvider]:
     """
     Instantiate a GraphImageProvider for each config.
 
     You must instantiate your GraphImageProviders manually if the data isn't stored as CSV or CSV.GZ where the
     first column is a DatetimeIndex
     """
-    result = {}
+    result = []
 
-    for name, sc in sensor_configs.items():
+    for sc in sensor_configs.values():
         data = pd.read_csv(sc.path, index_col=0, parse_dates=True)
-        result[name] = GraphImageProvider(data, render_config, sc)
+        result.append(GraphImageProvider(data, render_config, sc))
 
     return result
 
