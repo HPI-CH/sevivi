@@ -25,7 +25,7 @@ from sevivi.video_renderer.instantiation_helpers import (
 )
 
 
-def test_instantiate_cam_imu_video_provider():
+def test_instantiate_cam_imu_video_provider(run_in_repo_root):
     assert isinstance(
         instantiate_video_provider(
             CameraImuVideoConfig(
