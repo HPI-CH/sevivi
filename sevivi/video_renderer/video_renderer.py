@@ -1,13 +1,10 @@
-import logging
-from collections import defaultdict
 from math import ceil
-from typing import Dict, Tuple, Optional, List
+from typing import Tuple, Optional, List
 
 import cv2
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
-from matplotlib.axis import Axis
 from matplotlib.figure import Figure
 
 from sevivi.config import (
@@ -16,14 +13,11 @@ from sevivi.config import (
     ImuSynchronizedSensorConfig,
     ManuallySynchronizedSensorConfig,
     StackingDirection,
-    PlottingMethod,
-    SensorConfig,
 )
 from sevivi.image_provider import GraphImageProvider, VideoImageProvider, Dimensions
+from sevivi.log import logger
 from sevivi.synchronizer.synchronizer import get_synchronization_offset
 from .progress_bar import progress_bar
-
-from sevivi.log import logger
 
 logger = logger.getChild("video_renderer")
 
@@ -53,6 +47,7 @@ class VideoRenderer:
         self._prepare_graph_providers()
 
     def _prepare_dimensions(self) -> Tuple[Dimensions, Dimensions]:
+        """Calculate the desired plot and target video dimensions"""
         src_vid_dim = self.__src_vid_dims
         if self.render_config.stacking_direction == StackingDirection.VERTICAL:
             plot_w, plot_h = src_vid_dim.w, 200 * self._graph_count
@@ -63,6 +58,7 @@ class VideoRenderer:
         return Dimensions(plot_w, plot_h), Dimensions(video_w, video_h)
 
     def _prepare_figure(self) -> Tuple[Figure, np.ndarray]:
+        """Create a figure with subplots and return the figure and its subplots"""
         graph_rows = ceil(self._graph_count / self.render_config.plot_column_count)
         graph_cols = self.render_config.plot_column_count
 
@@ -79,7 +75,7 @@ class VideoRenderer:
         return fig, axs.ravel()
 
     def _prepare_graph_providers(self):
-        """Set offsets to graph providers"""
+        """Set offsets to graph providers and assigns the available axes to the graph providers"""
         assigned_axis_count = 0
         for gp in self.graph_providers:
             gp.set_offset(self._calc_offset(gp))
@@ -94,6 +90,10 @@ class VideoRenderer:
     def _calc_offset(
         self, graph_provider: GraphImageProvider
     ) -> Optional[pd.Timedelta]:
+        """
+        Calculate the offset to a graph provider using the synchronization module.
+        Returns None in case of manual synchronization
+        """
         config = graph_provider.sensor_config
 
         if isinstance(config, ManuallySynchronizedSensorConfig):

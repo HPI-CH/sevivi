@@ -1,5 +1,3 @@
-import collections
-import logging
 import os
 from pprint import pformat
 from typing import Tuple, Dict
@@ -108,7 +106,7 @@ def deep_update(source, overrides):
     https://stackoverflow.com/a/30655448
     """
     for key, value in overrides.items():
-        if isinstance(value, collections.Mapping) and value:
+        if isinstance(value, dict) and value:
             returned = deep_update(source.get(key, {}), value)
             source[key] = returned
         elif isinstance(value, list):
