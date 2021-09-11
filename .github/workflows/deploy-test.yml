@@ -2,10 +2,10 @@ name: Deploy to TestPyPi
 
 on:
   push:
-    branches:
-    - '**'        # run for all branches
     branches-ignore:
     - 'main'    # except main
+    tags:
+      - "v*.*.*"
 
 jobs:
     build-n-publish-testing:
