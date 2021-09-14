@@ -3,7 +3,7 @@ name: Deploy to PyPi
 on:
   push:
     tags:
-      - "v*.*.*"
+      - "v*"
 
 jobs:
     build-n-publish:
@@ -15,4 +15,4 @@ jobs:
             with:
                 python_version: '3.7.1'
                 poetry_version: '==1.1.7'  # (PIP version specifier syntax)
-                pypi_token: ${{ secrets.PYPI_TOKEN }}
+                pypi_token: ${{ secrets.PYPI_SECRET }}
