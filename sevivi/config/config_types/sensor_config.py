@@ -13,6 +13,8 @@ class SensorConfig:
 
     path: str = None
     """Path to the sensor data csv"""
+    name: str = ""
+    """Human readable name of the sensor for display purposes"""
     start_time: Optional[pd.Timestamp] = None
     """Start time of the sensor data. This is useful to select a portion of data from a longer recording"""
     end_time: Optional[pd.Timestamp] = None

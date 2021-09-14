@@ -5,6 +5,7 @@ import os
 import cv2
 
 from .video_provider import VideoImageProvider
+from ..dimensions import Dimensions
 
 
 class AzureProvider(VideoImageProvider):
@@ -27,3 +28,12 @@ class AzureProvider(VideoImageProvider):
 
     def get_sync_dataframe(self, column_names: List[str]) -> Optional[pd.DataFrame]:
         pass
+
+    def get_image_count(self) -> int:
+        return int(self.__video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+
+    def get_dimensions(self) -> Dimensions:
+        return Dimensions(
+            w=int(self.__video_capture.get(cv2.CAP_PROP_FRAME_WIDTH)),
+            h=int(self.__video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT)),
+        )

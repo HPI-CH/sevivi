@@ -1,26 +1,45 @@
-import logging
-from typing import Optional, List, Generator, Tuple
+"""The plain video image provider provides image from any video supported by openCV with manual synchronization."""
+from typing import List, Generator, Tuple
 
-import pandas as pd
-import os
 import cv2
+import pandas as pd
 
+from sevivi.log import logger
 from .video_provider import VideoImageProvider
+from ..dimensions import Dimensions
 
-logger = logging.getLogger("sevivi.plain_video_image_provider")
+logger = logger.getChild("plain_video_image_provider")
 
 
 class PlainVideoImageProvider(VideoImageProvider):
     """The plain video image provider provides image from any video supported by openCV with manual synchronization."""
 
     def __init__(self, video_path: str):
-        self.__video_capture = cv2.VideoCapture(video_path)
+        self.__video = cv2.VideoCapture(video_path)
 
-    def get_sync_dataframe(self, column_names: List[str]) -> Optional[pd.DataFrame]:
-        logger.warning(
-            "PlainVideoImageProvider can only be synced to manually. Ignoring get_sync_dataframe."
-        )
+    def get_sync_dataframe(self, column_names: List[str]) -> None:
+        """
+        Plain video doesn't have any data to synchronize against, so the sync dataframe is None.
+        """
         return None
 
     def images(self) -> Generator[Tuple[pd.Timestamp, bytes], None, None]:
-        pass
+        """Generate the images to be shown together with their timestamps"""
+        while self.__video.isOpened():
+            frame_exists, frame = self.__video.read()
+            if frame_exists:
+                ts = self.__video.get(cv2.CAP_PROP_POS_MSEC)
+                yield pd.to_datetime(ts, unit="ms"), frame
+            else:
+                break
+
+    def get_image_count(self) -> int:
+        """Get the number of images that will be rendered"""
+        return int(self.__video.get(cv2.CAP_PROP_FRAME_COUNT))
+
+    def get_dimensions(self) -> Dimensions:
+        """Get the dimensions of the source video in pixels."""
+        return Dimensions(
+            w=int(self.__video.get(cv2.CAP_PROP_FRAME_WIDTH)),
+            h=int(self.__video.get(cv2.CAP_PROP_FRAME_HEIGHT)),
+        )

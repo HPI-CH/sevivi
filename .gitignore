@@ -218,3 +218,5 @@ $RECYCLE.BIN/
 .idea
 .vscode
 
+*.mp4
+*.avi

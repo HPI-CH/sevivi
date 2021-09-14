@@ -13,4 +13,7 @@ class RenderConfig:
     parallel_image_ingestion: bool = False
     add_magnitude: bool = False
     draw_ticks: bool = False
-    target_file_path: str = "sevivi.mp4"
+    target_file_path: str = "sevivi.avi"
+    fourcc_codec: str = "MJPG"
+    plot_column_count = 2
+    """Number of columns to use in the plots. Should be divisible by 2 for StackingDirection.HORIZONTAL"""
