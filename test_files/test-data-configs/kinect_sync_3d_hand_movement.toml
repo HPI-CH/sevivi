@@ -1,16 +1,17 @@
 [[video]]
 type = "kinect"
 path = "test_files/videos/joint_synchronization_walking.mp4"
-skeleton_path = "test_files/skeletons/joint_synchronization_3d_hand_movement/positions_3d.csv.gz"
+skeleton_path_3d = "test_files/skeletons/joint_synchronization_3d_hand_movement/positions_3d.csv.gz"
+skeleton_path_2d = "test_files/skeletons/joint_synchronization_3d_hand_movement/positions_2d.csv.gz"
 
 [[sensor]]
 type = "joint-synced"
 sensor_sync_column_selection = ["Acc_X", "Acc_Y", "Acc_Z"]
-camera_joint_sync_column_selection = "ACCELERATION_MAG"
+camera_joint_sync_column_selection = ["SPINE_CHEST (x)", "SPINE_CHEST (y)", "SPINE_CHEST (z)"]
 path = "test_files/sensors/joint_synchronization_3d_hand_movement/LF.csv.gz"
 
 [[sensor]]
 type = "joint-synced"
 sensor_sync_column_selection = ["Acc_X", "Acc_Y", "Acc_Z"]
-camera_joint_sync_column_selection = "ACCELERATION_MAG"
+camera_joint_sync_column_selection = ["SPINE_CHEST (x)", "SPINE_CHEST (y)", "SPINE_CHEST (z)"]
 path = "test_files/sensors/joint_synchronization_3d_hand_movement/RF.csv.gz"

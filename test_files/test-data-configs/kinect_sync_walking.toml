@@ -1,18 +1,21 @@
+target_file_path = "walking_sevivi.avi"
+
 [[video]]
 type = "kinect"
 path = "test_files/videos/joint_synchronization_walking.mp4"
-skeleton_path = "test_files/skeletons/joint_synchronization_walking/positions_3d.csv.gz"
+skeleton_path_3d = "test_files/skeletons/joint_synchronization_walking/positions_3d.csv.gz"
+skeleton_path_2d = "test_files/skeletons/joint_synchronization_walking/positions_2d.csv.gz"
 
 [[sensor]]
 type = "joint-synced"
 sync_joint_name = "CHEST"
 sensor_sync_column_selection = ["Acc_X", "Acc_Y", "Acc_Z"]
-camera_joint_sync_column_selection = "ACCELERATION_MAG"
+camera_joint_sync_column_selection = ["SPINE_CHEST (x)", "SPINE_CHEST (y)", "SPINE_CHEST (z)"]
 path = "test_files/sensors/joint_synchronization_walking/LF.csv.gz"
 
 [[sensor]]
 type = "joint-synced"
 sync_joint_name = "ANKLE_RIGHT"
 sensor_sync_column_selection = ["Acc_X", "Acc_Y", "Acc_Z"]
-camera_joint_sync_column_selection = "ACCELERATION_MAG"
+camera_joint_sync_column_selection = ["ANKLE_RIGHT (x)", "ANKLE_RIGHT (y)", "ANKLE_RIGHT (z)"]
 path = "test_files/sensors/joint_synchronization_walking/RF.csv.gz"

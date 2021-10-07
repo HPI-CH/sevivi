@@ -62,7 +62,11 @@ def instantiate_video_provider(video_config: VideoConfig) -> VideoImageProvider:
     if isinstance(video_config, CameraImuVideoConfig):
         return ImuCameraImageProvider(video_config.path, video_config.imu_path)
     elif isinstance(video_config, KinectVideoConfig):
-        return AzureProvider(video_config.path, video_config.skeleton_path)
+        return AzureProvider(
+            video_config.path,
+            video_config.skeleton_path_3d,
+            video_config.skeleton_path_2d,
+        )
     elif isinstance(video_config, RawVideoConfig):
         return PlainVideoImageProvider(video_config.path)
     elif isinstance(video_config, OpenPoseVideoConfig):

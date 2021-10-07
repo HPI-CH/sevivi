@@ -57,6 +57,8 @@ class JointSynchronizedSensorConfig(SensorConfig):
     """Source columns from the camera skeleton to synchronize to"""
     sensor_sync_column_selection: Union[str, List[str]] = None
     """Columns from the sensor data to synchronize to"""
+    sync_joint_name: str = None
+    """Name of the sync sensor"""
 
 
 @dataclass
