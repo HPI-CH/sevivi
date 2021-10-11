@@ -24,15 +24,17 @@ class AzureProvider(VideoImageProvider):
 
         self.__video = cv2.VideoCapture(video_path)
         self.__joint_df_3d = self._drop_duplicate_body_indices_and_confidence_values(
-            pd.read_csv(joint_3d_df, sep=";").set_index("timestamp", drop=True)
+            pd.read_csv(joint_3d_df, sep=";", index_col=0)
         )
+        self.__joint_df_3d.index = pd.to_datetime(self.__joint_df_3d.index / 1e6, unit='s')
 
         if joint_2d_df is not None:
             self.__joint_df_2d = (
                 self._drop_duplicate_body_indices_and_confidence_values(
-                    pd.read_csv(joint_2d_df, sep=";").set_index("timestamp", drop=True)
+                    pd.read_csv(joint_2d_df, sep=";", index_col=0)
                 )
             )
+            self.__joint_df_2d.index = pd.to_datetime(self.__joint_df_2d.index / 1e6, unit='s')
             self.__skeleton_definition = self._read_skeleton_definition_as_tuple(
                 self.__joint_df_2d
             )
@@ -97,21 +99,18 @@ class AzureProvider(VideoImageProvider):
     def get_sync_dataframe(self, column_names: List[str]) -> Optional[pd.DataFrame]:
         if type(column_names) is str:
             if column_names not in self.__joint_df_3d.columns:
-                raise Exception(
-                    f"Sync joint name {column_names} not in Kinect dataframe."
-                )
+                raise KeyError(f"Sync joint name {column_names} not in Kinect dataframe.")
             else:
                 return self.__joint_df_3d[column_names]
 
         if type(column_names) is list:
-            valid = all(elem in self.__joint_df_3d.columns for elem in column_names)
-            if not valid:
-                raise Exception(f"Missing sync joints in Dataframe: {column_names}")
+            if not all(elem in self.__joint_df_3d.columns for elem in column_names):
+                raise KeyError(f"Missing sync joints in Dataframe: {column_names}.")
             return self.__joint_df_3d[
                 [col for col in column_names if col in self.__joint_df_3d.columns]
             ]
 
-        raise Exception(f"Wrong type given: {type(column_names)}, expected: List[str]")
+        raise TypeError(f"Wrong type given: {type(column_names)}, expected: List[str]")
 
     def get_image_count(self) -> int:
         return int(self.__video.get(cv2.CAP_PROP_FRAME_COUNT))
