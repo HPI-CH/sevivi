@@ -18,7 +18,7 @@ def test_get_sync_dataframe_wrong_joint(run_in_repo_root):
     ap = video_renderer_from_csv_files(config).video_provider
 
     with pytest.raises(KeyError):
-        ap.get_sync_dataframe('Unknown_Joint')
+        ap.get_sync_dataframe("Unknown_Joint")
 
 
 def test_get_sync_dataframe_wrong_joint_in_list(run_in_repo_root):
@@ -26,13 +26,13 @@ def test_get_sync_dataframe_wrong_joint_in_list(run_in_repo_root):
     ap = video_renderer_from_csv_files(config).video_provider
 
     with pytest.raises(KeyError):
-        ap.get_sync_dataframe(['PELVIS (x)', 'UNKNOWN_JOINT'])
+        ap.get_sync_dataframe(["PELVIS (x)", "UNKNOWN_JOINT"])
 
 
 def test_get_sync_dataframe_result_from_list(run_in_repo_root):
     config = read_configs(("test_files/test-data-configs/kinect_sync_walking.toml",))
     ap = video_renderer_from_csv_files(config).video_provider
-    sync_axes = ['PELVIS (x)', 'PELVIS (y)', 'PELVIS (z)']
+    sync_axes = ["PELVIS (x)", "PELVIS (y)", "PELVIS (z)"]
 
     df = ap.get_sync_dataframe(sync_axes)
     assert isinstance(df, pd.DataFrame)
@@ -44,7 +44,7 @@ def test_get_sync_dataframe_result_from_str(run_in_repo_root):
     config = read_configs(("test_files/test-data-configs/kinect_sync_walking.toml",))
     ap = video_renderer_from_csv_files(config).video_provider
 
-    sync_joint = 'PELVIS (x)'
+    sync_joint = "PELVIS (x)"
     df = ap.get_sync_dataframe(sync_joint)
     assert isinstance(df, pd.DataFrame)
     assert len(df.columns) == 1
