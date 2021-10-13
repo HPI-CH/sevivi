@@ -2,12 +2,18 @@ from typing import List, Optional, Generator, Tuple
 from collections import OrderedDict
 
 import pandas as pd
+import numpy as np
+import matplotlib.colors
 import os
 import cv2
 import json
 
 from .video_provider import VideoImageProvider
 from ..dimensions import Dimensions
+
+
+def get_hsv_color(cur_value: float, max_value: float) -> np.ndarray:
+    return matplotlib.colors.hsv_to_rgb([cur_value / max_value, 1, 1]) * 255
 
 
 class AzureProvider(VideoImageProvider):
@@ -26,7 +32,9 @@ class AzureProvider(VideoImageProvider):
         self.__joint_df_3d = self._drop_duplicate_body_indices_and_confidence_values(
             pd.read_csv(joint_3d_df, sep=";", index_col=0)
         )
-        self.__joint_df_3d.index = pd.to_datetime(self.__joint_df_3d.index / 1e6, unit='s')
+        self.__joint_df_3d.index = pd.to_datetime(
+            self.__joint_df_3d.index / 1e6, unit="s"
+        )
 
         if joint_2d_df is not None:
             self.__joint_df_2d = (
@@ -34,7 +42,9 @@ class AzureProvider(VideoImageProvider):
                     pd.read_csv(joint_2d_df, sep=";", index_col=0)
                 )
             )
-            self.__joint_df_2d.index = pd.to_datetime(self.__joint_df_2d.index / 1e6, unit='s')
+            self.__joint_df_2d.index = pd.to_datetime(
+                self.__joint_df_2d.index / 1e6, unit="s"
+            )
             self.__skeleton_definition = self._read_skeleton_definition_as_tuple(
                 self.__joint_df_2d
             )
@@ -84,12 +94,19 @@ class AzureProvider(VideoImageProvider):
             if frame_exists:
                 ts = self.__video.get(cv2.CAP_PROP_POS_MSEC)
 
-                # if self.__skeleton_definition is not None:
-                #     skeleton_data = (
-                #         self.__joint_df_2d.iloc[image_count, :]
-                #         .to_numpy()
-                #         .reshape(-1, 2)
-                #     )
+                if self.__skeleton_definition is not None and image_count < len(
+                    self.__joint_df_2d
+                ):
+                    skeleton_data = (
+                        self.__joint_df_2d.iloc[image_count, :]
+                        .to_numpy()
+                        .reshape(-1, 2)
+                    )
+                    for joint_count, (j1, j2) in enumerate(self.__skeleton_definition):
+                        p1 = tuple(int(x) for x in skeleton_data[j1])
+                        p2 = tuple(int(x) for x in skeleton_data[j2])
+                        color = get_hsv_color(joint_count, self.__joint_df_2d.shape[1])
+                        frame = cv2.line(frame, p1, p2, color=color, thickness=9)
 
                 yield pd.to_datetime(ts, unit="ms"), frame
                 image_count += 1
@@ -99,7 +116,9 @@ class AzureProvider(VideoImageProvider):
     def get_sync_dataframe(self, column_names: List[str]) -> Optional[pd.DataFrame]:
         if type(column_names) is str:
             if column_names not in self.__joint_df_3d.columns:
-                raise KeyError(f"Sync joint name {column_names} not in Kinect dataframe.")
+                raise KeyError(
+                    f"Sync joint name {column_names} not in Kinect dataframe."
+                )
             else:
                 return self.__joint_df_3d[column_names]
 
