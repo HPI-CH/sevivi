@@ -8,14 +8,12 @@ skeleton_path_2d = "test_files/skeletons/joint_synchronization_walking/positions
 
 [[sensor]]
 type = "joint-synced"
-sync_joint_name = "CHEST"
 sensor_sync_column_selection = ["Acc_X", "Acc_Y", "Acc_Z"]
 camera_joint_sync_column_selection = ["SPINE_CHEST (x)", "SPINE_CHEST (y)", "SPINE_CHEST (z)"]
 path = "test_files/sensors/joint_synchronization_walking/LF.csv.gz"
 
 [[sensor]]
 type = "joint-synced"
-sync_joint_name = "ANKLE_RIGHT"
 sensor_sync_column_selection = ["Acc_X", "Acc_Y", "Acc_Z"]
 camera_joint_sync_column_selection = ["ANKLE_RIGHT (x)", "ANKLE_RIGHT (y)", "ANKLE_RIGHT (z)"]
 path = "test_files/sensors/joint_synchronization_walking/RF.csv.gz"

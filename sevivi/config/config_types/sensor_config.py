@@ -48,7 +48,6 @@ class JointSynchronizedSensorConfig(SensorConfig):
     :Example:
     path: /tmp/my_ankle_imu.csv.gz
     start_time: 00:00:00.000000
-    sync_joint_name: ANKLE_RIGHT
     sensor_sync_column_selection: ["AX", "accel Y", "ACCELERATION_Z"]
     camera_joint_sync_column_selection: ACCELERATION_MAG
     """
@@ -57,8 +56,6 @@ class JointSynchronizedSensorConfig(SensorConfig):
     """Source columns from the camera skeleton to synchronize to"""
     sensor_sync_column_selection: Union[str, List[str]] = None
     """Columns from the sensor data to synchronize to"""
-    sync_joint_name: str = None
-    """Name of the sync sensor"""
 
 
 @dataclass
