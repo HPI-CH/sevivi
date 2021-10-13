@@ -19,6 +19,7 @@ def get_synchronization_offset(
         sensor_config: SensorConfig,
         show_plots: bool = False,
 ) -> pd.Timedelta:
+    """Get the temporal offset between the two given sensor dataframes"""
     video_sf = calculate_sampling_frequency_from_timestamps(video_sync_df.index)
     sensor_sf = calculate_sampling_frequency_from_timestamps(sensor_sync_df.index)
 

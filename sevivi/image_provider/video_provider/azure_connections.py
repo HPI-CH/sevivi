@@ -1,4 +1,4 @@
-[
+joint_definition = [
     [
         "HEAD",
         "NECK"
