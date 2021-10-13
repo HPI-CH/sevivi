@@ -11,10 +11,7 @@ def normalize_signal(data: np.ndarray) -> np.ndarray:
 
 
 def resample_data(
-        data: np.ndarray,
-        current_sampling_rate: int,
-        new_sampling_rate: int,
-        mode="cubic"
+    data: np.ndarray, current_sampling_rate: int, new_sampling_rate: int, mode="cubic"
 ) -> np.ndarray:
     """Resamples a signal to the desired new sampling frequency"""
     frames, features = data.shape
@@ -38,9 +35,7 @@ def calculate_magnitude(data: np.ndarray) -> np.ndarray:
 
 
 def calculate_offset_in_seconds_using_cross_correlation(
-        ref_signal: np.ndarray,
-        target_signal: np.ndarray,
-        sampling_frequency: int
+    ref_signal: np.ndarray, target_signal: np.ndarray, sampling_frequency: int
 ) -> float:
     """Calculates the temporal offset between the two given numpa arrays"""
     corr = signal.correlate(ref_signal, target_signal)

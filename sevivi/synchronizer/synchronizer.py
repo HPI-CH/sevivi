@@ -14,16 +14,18 @@ from .signal_processing import (
 
 
 def get_synchronization_offset(
-        video_sync_df: pd.DataFrame,
-        sensor_sync_df: pd.DataFrame,
-        sensor_config: SensorConfig,
-        show_plots: bool = False,
+    video_sync_df: pd.DataFrame,
+    sensor_sync_df: pd.DataFrame,
+    sensor_config: SensorConfig,
+    show_plots: bool = False,
 ) -> pd.Timedelta:
     """Get the temporal offset between the two given sensor dataframes"""
     video_sf = calculate_sampling_frequency_from_timestamps(video_sync_df.index)
     sensor_sf = calculate_sampling_frequency_from_timestamps(sensor_sync_df.index)
 
-    video_acceleration = np.gradient(np.gradient(video_sync_df.to_numpy(), axis=0), axis=0)
+    video_acceleration = np.gradient(
+        np.gradient(video_sync_df.to_numpy(), axis=0), axis=0
+    )
     video_acceleration = resample_data(
         video_acceleration,
         current_sampling_rate=video_sf,
@@ -40,24 +42,28 @@ def get_synchronization_offset(
         plt.figure(1)
         plt.plot(video_acceleration, label="Kinect")
         plt.plot(sensor_acceleration, label="IMU")
-        plt.xlabel('Time (s)')
-        plt.ylabel('Acceleration (normalized)')
+        plt.xlabel("Time (s)")
+        plt.ylabel("Acceleration (normalized)")
         plt.legend()
         plt.show()
 
     shift = calculate_offset_in_seconds_using_cross_correlation(
         ref_signal=video_acceleration,
         target_signal=sensor_acceleration,
-        sampling_frequency=sensor_sf
+        sampling_frequency=sensor_sf,
     )
 
     if show_plots:
         plt.close()
         plt.figure(1)
         plt.plot(video_acceleration, label="Kinect")
-        plt.plot(np.arange(len(sensor_acceleration)) + (sensor_sf * shift), sensor_acceleration, label="IMU")
-        plt.xlabel('Time (s)')
-        plt.ylabel('Acceleration (normalized)')
+        plt.plot(
+            np.arange(len(sensor_acceleration)) + (sensor_sf * shift),
+            sensor_acceleration,
+            label="IMU",
+        )
+        plt.xlabel("Time (s)")
+        plt.ylabel("Acceleration (normalized)")
         plt.legend()
         plt.show()
 
