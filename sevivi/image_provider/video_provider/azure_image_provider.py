@@ -120,7 +120,7 @@ class AzureProvider(VideoImageProvider):
                     f"Sync joint name {column_names} not in Kinect dataframe."
                 )
             else:
-                return self.__joint_df_3d[column_names]
+                return self.__joint_df_3d[column_names].to_frame()
 
         if type(column_names) is list:
             if not all(elem in self.__joint_df_3d.columns for elem in column_names):
