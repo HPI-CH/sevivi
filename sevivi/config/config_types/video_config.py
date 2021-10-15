@@ -28,14 +28,18 @@ class RawVideoConfig(VideoConfig):
 class KinectVideoConfig(VideoConfig):
     """Specify Kinect input video"""
 
-    skeleton_path: str = None
-    """Path to the skeleton extract from the kinect video"""
+    skeleton_path_3d: str = None
+    """Path to the 3D skeleton data"""
+    skeleton_path_2d: str = None
+    """Path to the 2D skeleton data"""
 
     def get_missing_files(self) -> List[str]:
         """Returns a list of all missing files for this config"""
         missing_files = super().get_missing_files()
-        if not os.path.isfile(self.skeleton_path):
-            missing_files.append(self.skeleton_path)
+        if not os.path.isfile(self.skeleton_path_3d):
+            missing_files.append(self.skeleton_path_3d)
+        if not os.path.isfile(self.skeleton_path_2d):
+            missing_files.append(self.skeleton_path_2d)
         return missing_files
 
 

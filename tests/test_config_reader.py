@@ -101,7 +101,7 @@ def test_read_kinect_video_config(run_in_repo_root):
     imu_conf = _vid_conf("kinect")
     assert imu_conf.path == "test_files/kinect.mkv"
     assert isinstance(imu_conf, KinectVideoConfig)
-    assert imu_conf.skeleton_path == "test_files/kinect.csv.gz"
+    assert imu_conf.skeleton_path_3d == "test_files/kinect.csv.gz"
 
 
 def test_read_openpose_video_config(run_in_repo_root):

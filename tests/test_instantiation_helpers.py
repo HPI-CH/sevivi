@@ -42,7 +42,7 @@ def test_instantiate_kinect_video_provider(run_in_repo_root):
         instantiate_video_provider(
             KinectVideoConfig(
                 path="test_files/videos/joint_synchronization_squatting.mp4",
-                skeleton_path="test_files/skeletons/joint_synchronization_squatting/positions_3d.csv.gz",
+                skeleton_path_3d="test_files/skeletons/joint_synchronization_squatting/positions_3d.csv.gz",
             )
         ),
         AzureProvider,

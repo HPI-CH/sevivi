@@ -1,4 +1,4 @@
 [[video]]
 path = "test_files/kinect.mkv"
-skeleton_path = "test_files/kinect.csv.gz"
+skeleton_path_3d = "test_files/kinect.csv.gz"
 type = "kinect"
