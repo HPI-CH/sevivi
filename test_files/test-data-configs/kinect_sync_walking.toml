@@ -15,5 +15,5 @@ path = "test_files/sensors/joint_synchronization_walking/LF.csv.gz"
 [[sensor]]
 type = "joint-synced"
 sensor_sync_column_selection = ["Acc_X", "Acc_Y", "Acc_Z"]
-camera_joint_sync_column_selection = ["ANKLE_RIGHT (x)", "ANKLE_RIGHT (y)", "ANKLE_RIGHT (z)"]
+camera_joint_sync_column_selection = ["SPINE_CHEST (x)", "SPINE_CHEST (y)", "SPINE_CHEST (z)"]
 path = "test_files/sensors/joint_synchronization_walking/RF.csv.gz"
