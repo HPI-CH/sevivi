@@ -1,16 +1,12 @@
+target_file_path = "camera_sevivi.avi"
+
 [[video]]
 type = "imu"
-path = "test_files/videos/todo.mp4"
-imu_path = "test_files/todo0.csv.gz"
+path = "test_files/videos/imu_sync.mp4"
+imu_path = "test_files/sensors/imu_synchronization/camera_imu.csv.gz"
 
 [[sensor]]
 type = "camera-imu-synced"
-sensor_sync_column_selection = ["Acc_X", "Acc_Y", "Acc_Z"]
-camera_imu_sync_column_selection = ["Acc_X", "Acc_Y", "Acc_Z"]
-path = "test_files/todo1.csv.gz"
-
-[[sensor]]
-type = "camera-imu-synced"
-sensor_sync_column_selection = ["Acc_X", "Acc_Y", "Acc_Z"]
-camera_imu_sync_column_selection = ["Acc_X", "Acc_Y", "Acc_Z"]
-path = "test_files/todo2.csv.gz"
+sensor_sync_column_selection = "ACCELERATION"
+camera_imu_sync_column_selection = "ACCELERATION"
+path = "test_files/sensors/imu_synchronization/LF.csv.gz"

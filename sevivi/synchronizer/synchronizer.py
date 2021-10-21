@@ -16,16 +16,29 @@ from .signal_processing import (
 def get_synchronization_offset(
     video_sync_df: pd.DataFrame,
     sensor_sync_df: pd.DataFrame,
-    sensor_config: SensorConfig,
-    show_plots: bool = False,
+    use_gradient: bool,
+    show_plots: bool = True,
 ) -> pd.Timedelta:
-    """Get the temporal offset between the two given sensor dataframes"""
+    """
+    Get the temporal offset between the two given sensor dataframes.
+
+    :param video_sync_df: the synchronization information from the video
+    :param sensor_sync_df: the synchronization information from the sensor
+    :param use_gradient: if true, the second derivation of the video synchronization data will be used. if false,
+                         the raw data will be used.
+    :param show_plots:  can enable debugging plots
+    :return:
+    """
     video_sf = calculate_sampling_frequency_from_timestamps(video_sync_df.index)
     sensor_sf = calculate_sampling_frequency_from_timestamps(sensor_sync_df.index)
 
-    video_acceleration = np.gradient(
-        np.gradient(video_sync_df.to_numpy(), axis=0), axis=0
-    )
+    if use_gradient:
+        video_acceleration = np.gradient(
+            np.gradient(video_sync_df.to_numpy(), axis=0), axis=0
+        )
+    else:
+        video_acceleration = video_sync_df.to_numpy()
+
     video_acceleration = resample_data(
         video_acceleration,
         current_sampling_rate=video_sf,
@@ -43,7 +56,7 @@ def get_synchronization_offset(
         plt.plot(video_acceleration, label="Kinect")
         plt.plot(sensor_acceleration, label="IMU")
         plt.xlabel("Time (s)")
-        plt.ylabel("Acceleration (normalized)")
+        plt.ylabel("Acceleration Magnitude (normalized)")
         plt.legend()
         plt.show()
 

@@ -99,15 +99,19 @@ class VideoRenderer:
         if isinstance(config, ManuallySynchronizedSensorConfig):
             return None
         elif isinstance(config, JointSynchronizedSensorConfig):
+            use_video_gradient_for_offset = True
             video_sync_cols = config.camera_joint_sync_column_selection
         elif isinstance(config, ImuSynchronizedSensorConfig):
+            use_video_gradient_for_offset = False
             video_sync_cols = config.camera_imu_sync_column_selection
         else:
             raise RuntimeError(f"Unknown sensor cfg type: {type(config)}")
 
         video_sync_df = self.video_provider.get_sync_dataframe(video_sync_cols)
         graph_sync_df = graph_provider.get_sync_dataframe()
-        offset = get_synchronization_offset(video_sync_df, graph_sync_df, config)
+        offset = get_synchronization_offset(
+            video_sync_df, graph_sync_df, use_video_gradient_for_offset
+        )
 
         logger.debug(f"Graph {graph_provider.sensor_config.name} gets offset {offset}")
         return offset
