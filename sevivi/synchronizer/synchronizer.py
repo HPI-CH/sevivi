@@ -17,7 +17,7 @@ def get_synchronization_offset(
     video_sync_df: pd.DataFrame,
     sensor_sync_df: pd.DataFrame,
     use_gradient: bool,
-    show_plots: bool = True,
+    show_plots: bool = False,
 ) -> pd.Timedelta:
     """
     Get the temporal offset between the two given sensor dataframes.
