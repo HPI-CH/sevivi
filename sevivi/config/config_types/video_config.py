@@ -59,5 +59,12 @@ class CameraImuVideoConfig(VideoConfig):
 
 
 @dataclass
+class VideoImuCaptureAppVideoConfig(CameraImuVideoConfig):
+    """Specify input from the Video IMU Capture App"""
+
+    pass
+
+
+@dataclass
 class OpenPoseVideoConfig(VideoConfig):
     """Specify OpenPose input video"""

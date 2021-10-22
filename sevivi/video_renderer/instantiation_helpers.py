@@ -6,6 +6,7 @@ import pandas as pd
 
 from sevivi.config import (
     CameraImuVideoConfig,
+    VideoImuCaptureAppVideoConfig,
     KinectVideoConfig,
     RawVideoConfig,
     OpenPoseVideoConfig,
@@ -20,6 +21,7 @@ from sevivi.image_provider import (
     ImuCameraImageProvider,
     VideoImageProvider,
     PlainVideoImageProvider,
+    VideoImuCaptureAppImageProvider,
 )
 from .video_renderer import VideoRenderer
 
@@ -59,7 +61,9 @@ def instantiate_graph_providers(
 
 def instantiate_video_provider(video_config: VideoConfig) -> VideoImageProvider:
     """Instantiate the appropriate VideoImageProvider subclass for a given VideoConfig"""
-    if isinstance(video_config, CameraImuVideoConfig):
+    if isinstance(video_config, VideoImuCaptureAppVideoConfig):
+        return VideoImuCaptureAppImageProvider(video_config.path, video_config.imu_path)
+    elif isinstance(video_config, CameraImuVideoConfig):
         return ImuCameraImageProvider(video_config.path, video_config.imu_path)
     elif isinstance(video_config, KinectVideoConfig):
         return AzureProvider(
