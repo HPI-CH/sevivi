@@ -54,16 +54,14 @@ def test_multi_config(run_in_repo_root):
     config_multi = _conf_dict("basic_config", "basic_config")
     assert config == config_multi
 
-    config_parallel_ingest = _conf_dict("basic_config", "use_parallel_ingestion")
-    assert config_parallel_ingest["use_parallel_image_ingestion"] is True
-
-
-def test_get_bool(run_in_repo_root):
-    config = _conf_dict("basic_config", "use_parallel_ingestion")
-    assert config_reader.get_bool(config, "use_parallel_image_ingestion") is True
-
-    with pytest.raises(ValueError):
-        config_reader.get_bool(config, "stacking_direction")
+    assert (
+        config_reader.get_plotting_method(config) == PlottingMethod.MOVING_VERTICAL_LINE
+    )
+    config_parallel_ingest = _conf_dict("basic_config", "push_in_plotting_method")
+    assert (
+        config_reader.get_plotting_method(config_parallel_ingest)
+        == PlottingMethod.PUSH_IN
+    )
 
 
 def test_plotting_method(run_in_repo_root):
@@ -92,7 +90,7 @@ def test_stack_direction(run_in_repo_root):
 
 def test_read_imu_video_config(run_in_repo_root):
     imu_conf = _vid_conf("imu")
-    assert imu_conf.path == "test_files/kinect.mkv"
+    assert imu_conf.path == "test_files/videos/imu_sync.mp4"
     assert isinstance(imu_conf, CameraImuVideoConfig)
     assert imu_conf.imu_path == "test_files/kinect_imu.csv.gz"
 
