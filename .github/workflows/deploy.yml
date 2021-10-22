@@ -2,6 +2,8 @@ name: Deploy to PyPi
 
 on:
   push:
+    branches:
+    - 'main'
     tags:
       - "v*"
 
