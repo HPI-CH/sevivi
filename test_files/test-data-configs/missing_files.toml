@@ -1,0 +1,16 @@
+[[video]]
+type = "imu"
+path = "test_files/videos/todo.mp4"
+imu_path = "test_files/todo0.csv.gz"
+
+[[sensor]]
+type = "camera-imu-synced"
+sensor_sync_column_selection = ["Acc_X", "Acc_Y", "Acc_Z"]
+camera_imu_sync_column_selection = ["Acc_X", "Acc_Y", "Acc_Z"]
+path = "test_files/todo1.csv.gz"
+
+[[sensor]]
+type = "camera-imu-synced"
+sensor_sync_column_selection = ["Acc_X", "Acc_Y", "Acc_Z"]
+camera_imu_sync_column_selection = ["Acc_X", "Acc_Y", "Acc_Z"]
+path = "test_files/todo2.csv.gz"
