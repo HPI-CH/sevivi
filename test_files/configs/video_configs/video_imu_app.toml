@@ -1,0 +1,7 @@
+[[video]]
+# path to the input video
+path = "test_files/videos/imu_sync.mp4"
+# specify the path to the IMU data; this is a protobuf file from the VideoImuCapture app
+imu_path = "test_files/sensors/video_imu_capture_app/video_meta.pb3"
+# config type to specify this is from the VideoImuCapture app
+type = "videoImuApp"

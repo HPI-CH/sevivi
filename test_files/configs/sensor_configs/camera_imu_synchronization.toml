@@ -1,5 +1,9 @@
 [[sensor]]
+# This is a sensor synchronized to the IMU of the camera.
 type = "camera-imu-synced"
+# Select the columns **from the sensor** that should be aligned to the columns **from the camera**
 sensor_sync_column_selection = ["AccX", "Accel Y"]
+# Select the columns **from the camera** that should be aligned to the columns **from the sensor**
 camera_imu_sync_column_selection = ["AccX", "Accel Y"]
+# Specify the path to the data
 path = "test_files/sensor_imu.csv.gz"

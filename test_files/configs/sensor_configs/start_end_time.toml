@@ -1,5 +1,7 @@
 [[sensor]]
+# Only data after this time (measured in unshifted sensor time) is included
 start_time = "00:00:00.000000"
+# Only data before this time (measured in unshifted sensor time) is included
 end_time = "00:00:01.000000"
 type = "manually-synced"
 path = "test_files/data/imu1.csv.gz"

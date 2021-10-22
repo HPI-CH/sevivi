@@ -1,4 +1,7 @@
 [[video]]
-path = "test_files/kinect.mkv"
+# video file path
+path = "test_files/videos/imu_sync.mp4"
+# specify this is a video with IMU data attached
 type = "imu"
+# specify the path to the IMU data
 imu_path = "test_files/kinect_imu.csv.gz"

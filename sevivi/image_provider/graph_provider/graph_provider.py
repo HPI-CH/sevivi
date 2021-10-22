@@ -43,11 +43,11 @@ class GraphImageProvider:
     def __init__(
         self,
         data: pd.DataFrame,
-        render_config: RenderConfig,
         sensor_config: SensorConfig,
+        plotting_method: PlottingMethod = PlottingMethod.MOVING_VERTICAL_LINE,
     ):
         self._data = epochize_index(data)
-        self.render_config = render_config
+        self.plotting_method = plotting_method
         self.sensor_config = sensor_config
 
         self.__axs: List[RenderAxis] = []
@@ -121,7 +121,7 @@ class GraphImageProvider:
         Figure must be the same figure the axes instances are from.
         Data will be rendered for the given timestamp.
         """
-        if self.render_config.plotting_method == PlottingMethod.MOVING_VERTICAL_LINE:
+        if self.plotting_method == PlottingMethod.MOVING_VERTICAL_LINE:
             for render_axis in self.__axs:
 
                 for bbox in render_axis.bounding_boxes.values():

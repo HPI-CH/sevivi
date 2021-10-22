@@ -11,6 +11,7 @@ from sevivi.config import (
     JointSynchronizedSensorConfig,
     find_matching_columns,
     get_graph_groups,
+    PlottingMethod,
 )
 from sevivi.image_provider import GraphImageProvider
 
@@ -19,29 +20,23 @@ def test_graph_count():
     dti = pd.to_datetime([datetime(2018, 1, 3)])
     df = pd.DataFrame(data={"A_x": [1], "A_y": [1], "A_z": [1], "G_x": [1]}, index=dti)
     assert (
-        GraphImageProvider(
-            df, RenderConfig(), SensorConfig(graph_groups=["A_"])
-        ).get_graph_count()
-        == 1
+        GraphImageProvider(df, SensorConfig(graph_groups=["A_"])).get_graph_count() == 1
     )
     assert (
         GraphImageProvider(
-            df, RenderConfig(), SensorConfig(graph_groups=["A_", "G_"])
+            df, SensorConfig(graph_groups=["A_", "G_"])
         ).get_graph_count()
         == 2
     )
     assert (
-        GraphImageProvider(
-            df, RenderConfig(), SensorConfig(graph_groups=["_"])
-        ).get_graph_count()
-        == 1
+        GraphImageProvider(df, SensorConfig(graph_groups=["_"])).get_graph_count() == 1
     )
 
 
 def test_get_sync_dataframe_cam_imu():
     dti = pd.to_datetime([datetime(2018, 1, 3)])
     df = pd.DataFrame(data={"A_x": [1], "A_y": [1], "A_z": [1], "G_x": [1]}, index=dti)
-    gip = GraphImageProvider(df, RenderConfig(), SensorConfig())
+    gip = GraphImageProvider(df, SensorConfig())
 
     gip.sensor_config = ImuSynchronizedSensorConfig(sensor_sync_column_selection="A_")
     assert gip.get_sync_dataframe().columns.tolist() == ["A_x", "A_y", "A_z"]
@@ -61,7 +56,7 @@ def test_get_sync_dataframe_cam_imu():
 def test_get_sync_dataframe_joints():
     dti = pd.to_datetime([datetime(2018, 1, 3)])
     df = pd.DataFrame(data={"A_x": [1], "A_y": [1], "A_z": [1], "G_x": [1]}, index=dti)
-    gip = GraphImageProvider(df, RenderConfig(), SensorConfig())
+    gip = GraphImageProvider(df, SensorConfig())
 
     gip.sensor_config = JointSynchronizedSensorConfig(sensor_sync_column_selection="A_")
     assert gip.get_sync_dataframe().columns.tolist() == ["A_x", "A_y", "A_z"]
@@ -83,7 +78,7 @@ def test_get_sync_data_frame_manual():
         [datetime(2018, 1, 1), datetime(2018, 1, 2), datetime(2018, 1, 3)]
     )
     df = pd.DataFrame(data={"A": [1, 2, 3]}, index=dti)
-    gip = GraphImageProvider(df, RenderConfig(), ManuallySynchronizedSensorConfig())
+    gip = GraphImageProvider(df, ManuallySynchronizedSensorConfig())
     assert gip.get_sync_dataframe() is None
 
 
@@ -92,16 +87,14 @@ def test_render_graph_axes():
         [datetime(2018, 1, 3), datetime(2018, 1, 2), datetime(2018, 1, 1)]
     )
     df = pd.DataFrame(data={"A": [1, 2, 3]}, index=dti)
-    graph_image_provider = GraphImageProvider(df, RenderConfig(), SensorConfig())
+    graph_image_provider = GraphImageProvider(df, SensorConfig())
     graph_image_provider.render_graph_axes(None, None)
 
 
 def test_set_offset_positive():
     dti = pd.to_datetime([datetime(2018, 1, 2), datetime(2018, 1, 3)])
     df = pd.DataFrame(data={"A": [1, 3]}, index=dti)
-    graph_image_provider = GraphImageProvider(
-        df, RenderConfig(), ManuallySynchronizedSensorConfig()
-    )
+    graph_image_provider = GraphImageProvider(df, ManuallySynchronizedSensorConfig())
     graph_image_provider.set_offset(pd.Timedelta(days=1))
     new_index = graph_image_provider._data.index
     expected = pd.to_datetime([datetime(1970, 1, 1), datetime(1970, 1, 2)])
@@ -112,9 +105,7 @@ def test_set_offset_positive():
 def test_set_offset_negative():
     dti = pd.to_datetime([datetime(2018, 1, 2), datetime(2018, 1, 3)])
     df = pd.DataFrame(data={"A": [1, 3]}, index=dti)
-    graph_image_provider = GraphImageProvider(
-        df, RenderConfig(), ManuallySynchronizedSensorConfig()
-    )
+    graph_image_provider = GraphImageProvider(df, ManuallySynchronizedSensorConfig())
     graph_image_provider.set_offset(pd.Timedelta(days=-1))
     new_index = graph_image_provider._data.index
     expected = pd.to_datetime([datetime(1970, 1, 1), datetime(1970, 1, 2)])
@@ -124,7 +115,7 @@ def test_set_offset_negative():
 
 def test_get_sync_data_frame_bad_index():
     with pytest.raises(ValueError):
-        GraphImageProvider(pd.DataFrame(), RenderConfig(), SensorConfig())
+        GraphImageProvider(pd.DataFrame(), SensorConfig())
 
 
 def test_get_graph_groups():

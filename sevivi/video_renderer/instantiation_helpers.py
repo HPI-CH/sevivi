@@ -54,7 +54,7 @@ def instantiate_graph_providers(
 
     for sc in sensor_configs.values():
         data = pd.read_csv(sc.path, index_col=0, parse_dates=True)
-        result.append(GraphImageProvider(data, render_config, sc))
+        result.append(GraphImageProvider(data, sc, render_config.plotting_method))
 
     return result
 

@@ -3,7 +3,7 @@ from typing import List, Generator, Tuple
 
 import cv2
 import pandas as pd
-from read_protobuf import read_protobuf, ProtobufReader
+from read_protobuf import ProtobufReader
 
 from sevivi.image_provider.video_provider.video_imu_capture_app import recording_pb2
 from sevivi.log import logger
@@ -25,17 +25,17 @@ class VideoImuCaptureAppImageProvider(VideoImageProvider):
     synchronizer implementation.
     """
 
-    def __init__(self, video_path: str, imu_df_path: str):
+    def __init__(self, video_path: str, imu_pb_path: str):
         self.__video = cv2.VideoCapture(video_path)
 
         try:
-            with open(imu_df_path, "rb") as f:
+            with open(imu_pb_path, "rb") as f:
                 message_data = f.read()
             message = recording_pb2.VideoCaptureData.FromString(message_data)
             data = ProtobufReader().interpret_message(message)
         except Exception as e:
             raise RuntimeError(
-                f"Could not read protobuf file {imu_df_path}. Is it from VideoIMUCapture_v0.12.apk?"
+                f"Could not read protobuf file {imu_pb_path}. Is it from VideoIMUCapture_v0.12.apk?"
             ) from e
 
         timestamps = [item["time_ns"] for item in data["imu"]]

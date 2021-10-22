@@ -62,12 +62,6 @@ def read_configs(config_file_paths: Tuple[str, ...]) -> Config:
         render_config.fourcc_codec = config_dict["fourcc_codec"]
     if "draw_ticks" in config_dict:
         render_config.draw_ticks = get_bool(config_dict, "draw_ticks")
-    if "add_magnitude" in config_dict:
-        render_config.add_magnitude = get_bool(config_dict, "add_magnitude")
-    if "use_parallel_image_ingestion" in config_dict:
-        render_config.use_parallel_image_ingestion = get_bool(
-            config_dict, "use_parallel_image_ingestion"
-        )
 
     if "plotting_method" in config_dict:
         render_config.plotting_method = get_plotting_method(config_dict)

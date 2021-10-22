@@ -1,4 +1,8 @@
 [[sensor]]
+# how many seconds into the future the data from this sensor should be move to align its start with the video start.
+# this value can be negative.
 offset_seconds = 123.4
+# A manually synchronized sensor
 type = "manually-synced"
+# path to the data of this sensor
 path = "test_files/manual_imu.csv.gz"

@@ -11,8 +11,6 @@ class RenderConfig:
     stacking_direction: StackingDirection = StackingDirection.HORIZONTAL
     plotting_method: PlottingMethod = PlottingMethod.MOVING_VERTICAL_LINE
     parallel_image_ingestion: bool = False
-    add_magnitude: bool = False
-    draw_ticks: bool = False
     target_file_path: str = "sevivi.avi"
     fourcc_codec: str = "MJPG"
     plot_column_count = 2
