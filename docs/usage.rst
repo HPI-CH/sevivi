@@ -44,6 +44,16 @@ Each later config file overwrites the configuration from previous configuration 
 There is one exception for this: the configuration for sensor data sources.
 Every sensor data source is appended to the list of all sources instead.
 
+If you have downloaded the repository, you can use our test data to get used to working
+with sevivi. Run the following:
+
+.. code-block:: shell
+
+    git clone git@github.com:your_name_here/sevivi.git
+    cd sevivi/
+    pip install sevivi
+    sevivi test-files/test-data-configs/kinect_sync_squatting.toml
+
 Configuration files are comprised of general options that apply to the entire tool,
 a video configuration section, and a number of sensor source configuration sections.
 
