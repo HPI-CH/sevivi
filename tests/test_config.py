@@ -9,7 +9,7 @@ def test_get_missing_files_all_available(run_in_repo_root):
 
 
 def test_get_missing_files_four_missing(run_in_repo_root):
-    config = read_configs(("test_files/test-data-configs/imu_sync.toml",))
+    config = read_configs(("test_files/test-data-configs/missing_files.toml",))
     missing = config.get_missing_files()
     assert len(missing) == 4
     assert "test_files/videos/todo.mp4" in missing

@@ -7,6 +7,7 @@ import pandas as pd
 from sevivi.log import logger
 from .video_provider import VideoImageProvider
 from ..dimensions import Dimensions
+from ...config import find_matching_columns
 
 logger = logger.getChild("plain_video_image_provider")
 
@@ -16,13 +17,16 @@ class ImuCameraImageProvider(VideoImageProvider):
 
     def __init__(self, video_path: str, imu_df_path: str):
         self.__video = cv2.VideoCapture(video_path)
-        self.data: pd.DataFrame = pd.read_csv(imu_df_path)
+        self.data: pd.DataFrame = pd.read_csv(
+            imu_df_path, index_col=0, parse_dates=True
+        )
 
     def get_sync_dataframe(self, column_names: List[str]) -> pd.DataFrame:
         """
         Returns the selected portion of the IMU data.
         """
-        return self.data[column_names]
+        matching_columns = find_matching_columns(self.data, column_names)
+        return self.data[matching_columns]
 
     def images(self) -> Generator[Tuple[pd.Timestamp, bytes], None, None]:
         """Generate the images to be shown together with their timestamps"""
