@@ -19,6 +19,7 @@ from sevivi.config import (
     Config,
     VideoConfig,
     RenderConfig,
+    VideoImuCaptureAppVideoConfig,
 )
 from sevivi.log import logger
 
@@ -128,6 +129,8 @@ def get_video_config(cfg: Dict) -> VideoConfig:
             result = CameraImuVideoConfig(**cfg)
         elif cfg_type == "kinect":
             result = KinectVideoConfig(**cfg)
+        elif cfg_type == "videoImuApp":
+            result = VideoImuCaptureAppVideoConfig(**cfg)
         elif cfg_type == "raw":
             result = RawVideoConfig()
         elif cfg_type == "openpose":

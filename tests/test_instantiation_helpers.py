@@ -5,17 +5,19 @@ from sevivi.config.config_types.sensor_config import (
     ManuallySynchronizedSensorConfig,
     ImuSynchronizedSensorConfig,
     JointSynchronizedSensorConfig,
-    SensorConfig,
 )
 from sevivi.config.config_types.video_config import (
     CameraImuVideoConfig,
     KinectVideoConfig,
     RawVideoConfig,
     OpenPoseVideoConfig,
+    VideoImuCaptureAppVideoConfig,
 )
-from sevivi.image_provider import AzureProvider, PlainVideoImageProvider
-from sevivi.image_provider.video_provider.imu_camera_image_provider import (
+from sevivi.image_provider import (
+    AzureProvider,
+    PlainVideoImageProvider,
     ImuCameraImageProvider,
+    VideoImuCaptureAppImageProvider,
 )
 from sevivi.video_renderer import VideoRenderer
 from sevivi.video_renderer.instantiation_helpers import (
@@ -34,6 +36,18 @@ def test_instantiate_cam_imu_video_provider(run_in_repo_root):
             )
         ),
         ImuCameraImageProvider,
+    )
+
+
+def test_instantiate_smartphone_imu_video_provider(run_in_repo_root):
+    assert isinstance(
+        instantiate_video_provider(
+            VideoImuCaptureAppVideoConfig(
+                path="test_files/videos/joint_synchronization_squatting.mp4",
+                imu_path="test_files/skeletons/joint_synchronization_squatting/positions_3d.csv.gz",
+            )
+        ),
+        VideoImuCaptureAppImageProvider,
     )
 
 

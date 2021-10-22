@@ -3,6 +3,7 @@ from .video_provider import (
     PlainVideoImageProvider,
     ImuCameraImageProvider,
     VideoImageProvider,
+    VideoImuCaptureAppImageProvider,
 )
 from .graph_provider import GraphImageProvider
 from .dimensions import Dimensions

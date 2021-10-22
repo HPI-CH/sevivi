@@ -16,6 +16,7 @@ from .config_types.video_config import (
     KinectVideoConfig,
     RawVideoConfig,
     OpenPoseVideoConfig,
+    VideoImuCaptureAppVideoConfig,
 )
 
 from .config_reader import read_configs
