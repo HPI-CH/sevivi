@@ -33,7 +33,7 @@ def parse_arguments(args: List[str]) -> Config:
     return result
 
 
-if __name__ == "__main__":
+def run():
     config = parse_arguments(sys.argv[1:])
     logger.debug(f"Sevivi config is: {pformat(config)}")
     logger.info(f"Rendering video to {config.render_config.target_file_path}")
