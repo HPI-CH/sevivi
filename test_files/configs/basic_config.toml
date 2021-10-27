@@ -1,5 +1,7 @@
+# May be 'vertical' to put all sensor graphs below the video, or 'horizontal' to put the sensor graphs left and right of
+# the center of the video
 stacking_direction = "horizontal"
-draw_ticks = false
-add_magnitude = false
-use_parallel_image_ingestion = true
+# currently, the only supported plotting method is moving_vertical_line
 plotting_method = "moving_vertical_line"
+# Set the four character codec name to save in the avi container
+fourcc_codec = "MJPG"

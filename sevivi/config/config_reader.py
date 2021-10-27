@@ -60,14 +60,6 @@ def read_configs(config_file_paths: Tuple[str, ...]) -> Config:
         render_config.target_file_path = config_dict["target_file_path"]
     if "fourcc_codec" in config_dict:
         render_config.fourcc_codec = config_dict["fourcc_codec"]
-    if "draw_ticks" in config_dict:
-        render_config.draw_ticks = get_bool(config_dict, "draw_ticks")
-    if "add_magnitude" in config_dict:
-        render_config.add_magnitude = get_bool(config_dict, "add_magnitude")
-    if "use_parallel_image_ingestion" in config_dict:
-        render_config.use_parallel_image_ingestion = get_bool(
-            config_dict, "use_parallel_image_ingestion"
-        )
 
     if "plotting_method" in config_dict:
         render_config.plotting_method = get_plotting_method(config_dict)
@@ -183,16 +175,6 @@ def get_sensor_configs(config_dict: Dict) -> Dict[str, SensorConfig]:
         )
 
     return result_dict
-
-
-def get_bool(config_dict: Dict, key_name: str) -> bool:
-    value = config_dict[key_name]
-    if isinstance(value, bool):
-        return value
-    else:
-        raise ValueError(
-            f"Configuration value {value} for key {key_name} is not a boolean"
-        )
 
 
 def get_plotting_method(config_dict: Dict) -> PlottingMethod:

@@ -1,3 +1,5 @@
 [[video]]
+# source video file
 path = "test_files/raw.mkv"
+# type is "raw" as this video doesn't have any data associated with it
 type = "raw"
