@@ -1,5 +1,5 @@
 from math import ceil
-from typing import Tuple, Optional, List
+from typing import Tuple, Optional, List, Callable
 
 import cv2
 import numpy as np
@@ -35,7 +35,18 @@ class VideoRenderer:
         render_config: RenderConfig,
         video_provider: VideoImageProvider,
         graph_providers: List[GraphImageProvider],
+        synchronization_function: Callable[
+            [pd.DataFrame, pd.DataFrame, bool, Optional[bool]], pd.Timedelta
+        ] = get_synchronization_offset,
     ):
+        """
+        :param render_config: rendering configuration, e.g., horizontal or vertical stacking
+        :param video_provider: the video provider for the video
+        :param graph_providers: the graph providers for each sensor
+        :param synchronization_function: a synchronization function that adheres to the specifications of
+                                         sevivi.synchronizer.synchronizer.get_synchronization_offset
+        """
+        self.synchronization_function = synchronization_function
         self.render_config = render_config
         self.video_provider = video_provider
         self.graph_providers = graph_providers
@@ -109,7 +120,7 @@ class VideoRenderer:
 
         video_sync_df = self.video_provider.get_sync_dataframe(video_sync_cols)
         graph_sync_df = graph_provider.get_sync_dataframe()
-        offset = get_synchronization_offset(
+        offset = self.synchronization_function(
             video_sync_df, graph_sync_df, use_video_gradient_for_offset
         )
 

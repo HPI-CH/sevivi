@@ -1,5 +1,3 @@
-from sevivi.config.config_types.sensor_config import SensorConfig
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -27,7 +25,8 @@ def get_synchronization_offset(
     :param use_gradient: if true, the second derivation of the video synchronization data will be used. if false,
                          the raw data will be used.
     :param show_plots:  can enable debugging plots
-    :return:
+    :return: a pd.Timedelta object that specifies how much the sensor_sync_df needs to be moved in time to align it with
+            the video_sync_df
     """
     video_sf = calculate_sampling_frequency_from_timestamps(video_sync_df.index)
     sensor_sf = calculate_sampling_frequency_from_timestamps(sensor_sync_df.index)
