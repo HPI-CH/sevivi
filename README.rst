@@ -31,7 +31,15 @@ sevivi is a python package and command line tool to generate videos of sensor da
 Features
 --------
 
-* TODO
+Sevivi is designed to render plots of sensor data next to a video that was taken synchronously, synchronizing the sensor
+data precisely to the video.
+It allows you to investigate why certain patterns occur in your sensor data based on the exact moment in the video.
+
+It can be used as a command-line program or a library for more advanced usage, and the following video types are supported:
+
+* Render sensor data with IMUs next to a video with skeleton data
+* Render sensor data with IMUs next to a video provided together with IMU data
+* Render arbitrary sensor data next to a video, synchronizing with manual offsets
 
 Installation
 ------------

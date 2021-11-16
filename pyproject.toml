@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sevivi"
-version = "1.0.2"
+version = "1.0.3"
 description = "Create a video with graphs synchronous to a source video"
 authors = [
     "Justin Albert <justin.albert@hpi.de>",

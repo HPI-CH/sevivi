@@ -3,7 +3,12 @@ History
 =======
 
 
-X.Y.Z (YYYY-MM-DD)
+1.0.3 (2021-11-16)
 ------------------
 
-* TODO
+* Update README files
+
+1.0.2 (2021-11-16)
+------------------
+
+* First public release
