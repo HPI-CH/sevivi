@@ -12,16 +12,12 @@ sevivi readme
 .. image:: https://github.com/hpi-dhc/sevivi/actions/workflows/all.yml/badge.svg
         :target: https://github.com/hpi-dhc/sevivi/actions/workflows/all.yml?query=branch%3Amain
 
-.. image:: https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/enra64/f731de158a21515e2d6c52ed48d406ad/raw/sevivi_coverage_main.json
-        :target: https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/enra64/f731de158a21515e2d6c52ed48d406ad/raw/sevivi_coverage_main.json
+.. image:: https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/enra64/a31baa6cd608054767ab49693000dbfd/raw/sevivi_coverage_main.json
+        :target: https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/enra64/a31baa6cd608054767ab49693000dbfd/raw/sevivi_coverage_main.json
 
 .. image:: https://readthedocs.org/projects/sevivi/badge/?version=latest
         :target: https://sevivi.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
-
-.. image:: https://pyup.io/repos/github/hpi-dhc/sevivi/shield.svg
-     :target: https://pyup.io/repos/github/hpi-dhc/sevivi/
-     :alt: Updates
 
 .. image:: https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg
      :target: https://github.com/hpi-dhc/sevivi/blob/master/CODE_OF_CONDUCT.md
